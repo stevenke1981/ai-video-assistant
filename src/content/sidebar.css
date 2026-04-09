@@ -849,6 +849,9 @@
 }
 .aiv-settings-eye:hover { border-color: var(--aiv-brand); }
 
+.aiv-btn-test { margin-top: 2px; }
+.aiv-btn-test:disabled { opacity: .6; cursor: not-allowed; }
+
 .aiv-settings-hint {
   font-size: 10px;
   color: var(--aiv-muted);

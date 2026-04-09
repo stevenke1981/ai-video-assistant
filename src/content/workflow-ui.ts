@@ -832,6 +832,44 @@ export class WorkflowUI {
     hint.textContent = "設定變更後自動儲存。金鑰僅存於本機 chrome.storage.local。";
     section.appendChild(hint);
 
+    // Test button
+    const testBtn = document.createElement("button");
+    testBtn.className = "aiv-btn aiv-btn-outline aiv-btn-test";
+    testBtn.textContent = "🔌 測試連線";
+    testBtn.addEventListener("click", async () => {
+      const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
+      const cfg: ApiConfig = {
+        key: keyInput.value.trim(),
+        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta/openai",
+        model: model || "gemma-4-31b-it",
+        enabled: true,
+      };
+      if (!cfg.key) { this.toast("請先輸入 API 金鑰", "error"); return; }
+      testBtn.disabled = true;
+      testBtn.textContent = "⏳ 測試中…";
+      try {
+        const endpoint = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cfg.key}` },
+          body: JSON.stringify({ model: cfg.model, messages: [{ role: "user", content: "Hi" }], max_tokens: 10 }),
+        });
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(`${res.status}: ${err.substring(0, 150)}`);
+        }
+        testBtn.textContent = "✅ 連線成功";
+        this.toast(`${cfg.model} 連線正常 ✅`, "success");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        testBtn.textContent = "❌ 連線失敗";
+        this.toast(`連線失敗：${msg}`, "error");
+      } finally {
+        setTimeout(() => { testBtn.textContent = "🔌 測試連線"; testBtn.disabled = false; }, 3000);
+      }
+    });
+    section.appendChild(testBtn);
+
     els.push(section);
 
     // Auto-save on any change
