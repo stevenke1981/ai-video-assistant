@@ -16,7 +16,9 @@ import {
   fillTemplate,
   ApiConfig,
   ApiHistoryEntry,
+  ApiProvider,
   PRESET_MODELS,
+  PROVIDER_DEFAULTS,
 } from "../models/workflow";
 import {
   getTemplates,
@@ -738,7 +740,7 @@ export class WorkflowUI {
     header.append(back, title);
     els.push(header);
 
-    const cfg = this.apiConfig ?? { key: "", endpoint: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemma-3-27b-it", enabled: false };
+    const cfg = this.apiConfig ?? { ...{ provider: "gemini" as ApiProvider, key: "", endpoint: "https://generativelanguage.googleapis.com/v1beta", model: "gemma-4-31b-it", enabled: false, thinkingEnabled: false } };
 
     // ── API Config form ──
     const section = document.createElement("div");
@@ -761,7 +763,7 @@ export class WorkflowUI {
     enableRow.appendChild(toggleWrap);
     section.appendChild(enableRow);
 
-    // Think mode toggle
+    // Think mode toggle (Gemini only)
     const thinkRow = document.createElement("div");
     thinkRow.className = "aiv-settings-row";
     thinkRow.innerHTML = `<span class="aiv-settings-label">🧠 Think 模式<span class="aiv-settings-hint-inline">（Gemma 4 深度推理）</span></span>`;
@@ -778,6 +780,31 @@ export class WorkflowUI {
     thinkRow.appendChild(thinkWrap);
     section.appendChild(thinkRow);
 
+    // ── Provider selector ──
+    const providerGroup = document.createElement("div");
+    providerGroup.className = "aiv-var-group";
+    providerGroup.innerHTML = `<label class="aiv-var-label">API 服務商</label>`;
+    const providerSelect = document.createElement("select");
+    providerSelect.className = "aiv-style-select";
+    [
+      { label: "🔵 Google AI Studio (Gemini/Gemma)", value: "gemini" },
+      { label: "🟠 OpenRouter", value: "openrouter" },
+    ].forEach(({ label, value }) => {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      providerSelect.appendChild(opt);
+    });
+    providerSelect.value = cfg.provider ?? "gemini";
+    providerGroup.appendChild(providerSelect);
+    section.appendChild(providerGroup);
+
+    // Think mode only applies to Gemini
+    thinkRow.style.display = cfg.provider === "openrouter" ? "none" : "flex";
+    providerSelect.addEventListener("change", () => {
+      thinkRow.style.display = providerSelect.value === "openrouter" ? "none" : "flex";
+    });
+
     // API Key
     const keyGroup = document.createElement("div");
     keyGroup.className = "aiv-var-group";
@@ -787,7 +814,7 @@ export class WorkflowUI {
     const keyInput = document.createElement("input");
     keyInput.className = "aiv-var-input";
     keyInput.type = "password";
-    keyInput.placeholder = "sk-... 或 AIzaSy...";
+    keyInput.placeholder = "AIzaSy... (Gemini) 或 sk-or-... (OpenRouter)";
     keyInput.value = cfg.key;
     const eyeBtn = document.createElement("button");
     eyeBtn.className = "aiv-settings-eye";
@@ -808,21 +835,37 @@ export class WorkflowUI {
 
     const modelSelect = document.createElement("select");
     modelSelect.className = "aiv-style-select";
-    const isCustom = !PRESET_MODELS.some((m) => m.value === cfg.model && m.value !== "__custom__");
-    PRESET_MODELS.forEach((m) => {
-      const opt = document.createElement("option");
-      opt.value = m.value;
-      opt.textContent = m.label;
-      modelSelect.appendChild(opt);
-    });
-    modelSelect.value = isCustom ? "__custom__" : cfg.model;
 
     const customInput = document.createElement("input");
     customInput.className = "aiv-var-input";
     customInput.style.marginTop = "4px";
     customInput.placeholder = "輸入自訂模型名稱";
-    customInput.value = cfg.model;
-    customInput.style.display = (modelSelect.value === "__custom__") ? "block" : "none";
+
+    const rebuildModelOptions = (provider: ApiProvider) => {
+      modelSelect.innerHTML = "";
+      const presets = PRESET_MODELS[provider];
+      const isCustom = !presets.some((m) => m.value === cfg.model && m.value !== "__custom__");
+      presets.forEach((m) => {
+        const opt = document.createElement("option");
+        opt.value = m.value;
+        opt.textContent = m.label;
+        modelSelect.appendChild(opt);
+      });
+      // When switching providers, default to that provider's default model
+      const defaultModel = PROVIDER_DEFAULTS[provider].model;
+      const currentIsValid = presets.some((m) => m.value === cfg.model);
+      modelSelect.value = currentIsValid ? (isCustom ? "__custom__" : cfg.model) : defaultModel;
+      customInput.value = modelSelect.value === "__custom__" ? cfg.model : modelSelect.value;
+      customInput.style.display = modelSelect.value === "__custom__" ? "block" : "none";
+    };
+
+    rebuildModelOptions(cfg.provider ?? "gemini");
+
+    providerSelect.addEventListener("change", () => {
+      const p = providerSelect.value as ApiProvider;
+      epInput.value = PROVIDER_DEFAULTS[p].endpoint;
+      rebuildModelOptions(p);
+    });
 
     modelSelect.addEventListener("change", () => {
       customInput.style.display = modelSelect.value === "__custom__" ? "block" : "none";
@@ -835,11 +878,10 @@ export class WorkflowUI {
     // Endpoint
     const epGroup = document.createElement("div");
     epGroup.className = "aiv-var-group";
-    epGroup.innerHTML = `<label class="aiv-var-label">API Endpoint（OpenAI 相容格式）</label>`;
+    epGroup.innerHTML = `<label class="aiv-var-label">API Endpoint</label>`;
     const epInput = document.createElement("input");
     epInput.className = "aiv-var-input";
     epInput.type = "text";
-    epInput.placeholder = "https://generativelanguage.googleapis.com/v1beta";
     epInput.value = cfg.endpoint;
     epGroup.appendChild(epInput);
     section.appendChild(epGroup);
@@ -855,31 +897,23 @@ export class WorkflowUI {
     testBtn.className = "aiv-btn aiv-btn-outline aiv-btn-test";
     testBtn.textContent = "🔌 測試連線";
     testBtn.addEventListener("click", async () => {
+      const provider = providerSelect.value as ApiProvider;
       const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
-      const cfg: ApiConfig = {
+      const testCfg: ApiConfig = {
+        provider,
         key: keyInput.value.trim(),
-        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta",
-        model: model || "gemma-4-31b-it",
+        endpoint: epInput.value.trim() || PROVIDER_DEFAULTS[provider].endpoint,
+        model: model || PROVIDER_DEFAULTS[provider].model,
         enabled: true,
         thinkingEnabled: thinkInput.checked,
       };
-      if (!cfg.key) { this.toast("請先輸入 API 金鑰", "error"); return; }
+      if (!testCfg.key) { this.toast("請先輸入 API 金鑰", "error"); return; }
       testBtn.disabled = true;
       testBtn.textContent = "⏳ 測試中…";
       try {
-        const base = cfg.endpoint.replace(/\/$/, "");
-        const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: "Hi" }] }] }),
-        });
-        if (!res.ok) {
-          const err = await res.text();
-          throw new Error(`${res.status}: ${err.substring(0, 150)}`);
-        }
+        await this.testApiConnection(testCfg);
         testBtn.textContent = "✅ 連線成功";
-        this.toast(`${cfg.model} 連線正常 ✅`, "success");
+        this.toast(`${testCfg.model} 連線正常 ✅`, "success");
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         testBtn.textContent = "❌ 連線失敗";
@@ -894,11 +928,13 @@ export class WorkflowUI {
 
     // Auto-save on any change
     const autoSave = () => {
+      const provider = providerSelect.value as ApiProvider;
       const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
       const next: ApiConfig = {
+        provider,
         key: keyInput.value.trim(),
-        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta",
-        model: model || "gemma-4-31b-it",
+        endpoint: epInput.value.trim() || PROVIDER_DEFAULTS[provider].endpoint,
+        model: model || PROVIDER_DEFAULTS[provider].model,
         enabled: toggleInput.checked,
         thinkingEnabled: thinkInput.checked,
       };
@@ -906,8 +942,7 @@ export class WorkflowUI {
       saveApiConfig(next);
     };
     [keyInput, epInput, customInput].forEach((el) => el.addEventListener("input", autoSave));
-    [toggleInput, thinkInput].forEach((el) => el.addEventListener("change", autoSave));
-    modelSelect.addEventListener("change", autoSave);
+    [toggleInput, thinkInput, providerSelect, modelSelect].forEach((el) => el.addEventListener("change", autoSave));
 
     // ── API History ──
     const histHeader = document.createElement("div");
@@ -1022,6 +1057,7 @@ export class WorkflowUI {
         prompt,
         response,
         model: this.apiConfig?.model ?? "",
+        provider: this.apiConfig?.provider ?? "gemini",
         stage: this.activeTab,
         sentAt: Date.now(),
       };
@@ -1038,59 +1074,97 @@ export class WorkflowUI {
     }
   }
 
+  private readonly SYSTEM_PROMPT = [
+    "你是一個專業的影片製作提示詞生成助手。",
+    "規則（不可違反）：",
+    "1. 收到任務後立即直接生成最終內容，從第一個段落開始輸出。",
+    "2. 禁止說明你將要做什麼、禁止確認任務、禁止問使用者任何問題。",
+    "3. 嚴格依照模板結構順序完整輸出每個指定段落，不得省略。",
+    "4. 若模板要求多個角度或多個段落，必須逐一完整輸出，不得合併或縮略。",
+    "5. 輸出語言與模板保持一致。",
+  ].join("\n");
+
   private async callApi(prompt: string): Promise<string> {
     const cfg = this.apiConfig;
     if (!cfg || !cfg.key) throw new Error("尚未設定 API 金鑰");
+    const userPrompt = `以下是已填寫完成的資料與輸出要求，請立即依格式生成所有指定內容：\n\n${prompt}`;
+    return cfg.provider === "openrouter"
+      ? this.callOpenRouter(cfg, userPrompt)
+      : this.callGemini(cfg, userPrompt);
+  }
 
+  private async callGemini(cfg: ApiConfig, prompt: string): Promise<string> {
     const base = cfg.endpoint.replace(/\/$/, "");
     const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
-
     const body: Record<string, unknown> = {
-      system_instruction: {
-        parts: [{
-          text: [
-            "你是一個專業的影片製作提示詞生成助手。",
-            "規則（不可違反）：",
-            "1. 收到任務後立即直接生成最終內容，從第一個段落開始輸出。",
-            "2. 禁止說明你將要做什麼、禁止確認任務、禁止問使用者任何問題。",
-            "3. 嚴格依照模板結構順序完整輸出每個指定段落，不得省略。",
-            "4. 若模板要求多個角度或多個段落，必須逐一完整輸出，不得合併或縮略。",
-            "5. 輸出語言與模板保持一致。",
-          ].join("\n"),
-        }],
-      },
-      contents: [{
-        parts: [{
-          text: `以下是已填寫完成的角色資料與輸出要求，請立即依格式生成所有指定內容：\n\n${prompt}`,
-        }],
-      }],
+      system_instruction: { parts: [{ text: this.SYSTEM_PROMPT }] },
+      contents: [{ parts: [{ text: prompt }] }],
     };
-
     if (cfg.thinkingEnabled) {
-      body.generationConfig = {
-        thinkingConfig: { thinkingBudget: 8192 },
-      };
+      body.generationConfig = { thinkingConfig: { thinkingBudget: 8192 } };
     }
-
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`${res.status} ${err.substring(0, 200)}`);
-    }
-
-    const data = await res.json() as {
-      candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[];
-    };
-    // Filter out thought parts, only return actual response text
+    if (!res.ok) throw new Error(`${res.status} ${(await res.text()).substring(0, 200)}`);
+    const data = await res.json() as { candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[] };
     const parts = data?.candidates?.[0]?.content?.parts ?? [];
     const text = parts.filter((p) => !p.thought).map((p) => p.text ?? "").join("").trim();
     if (!text) throw new Error("API 回應格式異常");
     return text;
+  }
+
+  private async callOpenRouter(cfg: ApiConfig, prompt: string): Promise<string> {
+    const url = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${cfg.key}`,
+        "HTTP-Referer": "https://github.com/stevenke1981/ai-video-assistant",
+        "X-Title": "AI Video Assistant",
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [
+          { role: "system", content: this.SYSTEM_PROMPT },
+          { role: "user", content: prompt },
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error(`${res.status} ${(await res.text()).substring(0, 200)}`);
+    const data = await res.json() as { choices?: { message?: { content?: string } }[] };
+    const text = data?.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error("API 回應格式異常");
+    return text;
+  }
+
+  private async testApiConnection(cfg: ApiConfig): Promise<void> {
+    if (cfg.provider === "openrouter") {
+      const url = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${cfg.key}`,
+          "HTTP-Referer": "https://github.com/stevenke1981/ai-video-assistant",
+          "X-Title": "AI Video Assistant",
+        },
+        body: JSON.stringify({ model: cfg.model, messages: [{ role: "user", content: "Hi" }], max_tokens: 5 }),
+      });
+      if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).substring(0, 150)}`);
+    } else {
+      const base = cfg.endpoint.replace(/\/$/, "");
+      const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: "Hi" }] }] }),
+      });
+      if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).substring(0, 150)}`);
+    }
   }
 
   private buildHistoryView(): HTMLElement[] {

@@ -175,7 +175,10 @@ export interface TemplateFile {
 
 // ── API Config ───────────────────────────────────────────────────────────────
 
+export type ApiProvider = "gemini" | "openrouter";
+
 export interface ApiConfig {
+  provider: ApiProvider;
   key: string;
   endpoint: string;
   model: string;
@@ -188,11 +191,13 @@ export interface ApiHistoryEntry {
   prompt: string;
   response: string;
   model: string;
+  provider: ApiProvider;
   stage: WorkflowStage;
   sentAt: number;
 }
 
 export const DEFAULT_API_CONFIG: ApiConfig = {
+  provider: "gemini",
   key: "",
   endpoint: "https://generativelanguage.googleapis.com/v1beta",
   model: "gemma-4-31b-it",
@@ -200,14 +205,26 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
   thinkingEnabled: false,
 };
 
-export const PRESET_MODELS = [
-  { label: "Gemma 4 31B (Google AI Studio)", value: "gemma-4-31b-it" },
-  { label: "Gemma 4 26B A4B (Google AI Studio)", value: "gemma-4-26b-a4b-it" },
-  { label: "Gemma 3 27B (Google AI Studio)", value: "gemma-3-27b-it" },
-  { label: "GPT-4o mini (OpenAI)", value: "gpt-4o-mini" },
-  { label: "GPT-4o (OpenAI)", value: "gpt-4o" },
-  { label: "自訂（手動輸入）", value: "__custom__" },
-];
+export const PROVIDER_DEFAULTS: Record<ApiProvider, { endpoint: string; model: string }> = {
+  gemini:     { endpoint: "https://generativelanguage.googleapis.com/v1beta", model: "gemma-4-31b-it" },
+  openrouter: { endpoint: "https://openrouter.ai/api/v1",                    model: "arcee-ai/trinity-large-preview:free" },
+};
+
+export const PRESET_MODELS: Record<ApiProvider, { label: string; value: string }[]> = {
+  gemini: [
+    { label: "Gemma 4 31B", value: "gemma-4-31b-it" },
+    { label: "Gemma 4 26B A4B", value: "gemma-4-26b-a4b-it" },
+    { label: "Gemma 3 27B", value: "gemma-3-27b-it" },
+    { label: "自訂（手動輸入）", value: "__custom__" },
+  ],
+  openrouter: [
+    { label: "Arcee Trinity Large (免費)", value: "arcee-ai/trinity-large-preview:free" },
+    { label: "Llama 3.3 70B (免費)", value: "meta-llama/llama-3.3-70b-instruct:free" },
+    { label: "Gemma 3 27B (免費)", value: "google/gemma-3-27b-it:free" },
+    { label: "Mistral Small 3.1 (免費)", value: "mistralai/mistral-small-3.1-24b-instruct:free" },
+    { label: "自訂（手動輸入）", value: "__custom__" },
+  ],
+};
 
 // ── Settings ─────────────────────────────────────────────────────────────────
 
