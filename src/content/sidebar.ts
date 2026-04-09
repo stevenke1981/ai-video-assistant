@@ -83,7 +83,11 @@ class SidebarController {
       const callbacks: UICallbacks = {
         onSendToAI: (text: string) => {
           const a = detectAdapter();
-          if (a) a.sendMessage(text);
+          if (!a) return;
+          const el = a.getInputElement();
+          if (!el) return;
+          a.setText(el, text);
+          a.submit(el);
         },
         onCaptureImage: () => {
           const a = detectAdapter();
