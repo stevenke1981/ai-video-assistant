@@ -1118,6 +1118,53 @@
 }
 .aiv-wizard-result-textarea:focus { border-color: var(--aiv-brand); }
 
+/* Prompt editor (AI API template defaults) */
+.aiv-wizard-prompt-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aiv-wizard-prompt-badge {
+  background: var(--aiv-warn);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 1px 6px;
+}
+
+.aiv-wizard-prompt-textarea {
+  width: 100%;
+  background: var(--aiv-bg);
+  border: none;
+  border-top: 1px solid var(--aiv-border);
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--aiv-text);
+  font-family: "Courier New", monospace;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 140px;
+  outline: none;
+}
+.aiv-wizard-prompt-textarea:focus { border-color: var(--aiv-brand); }
+
+.aiv-wizard-prompt-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--aiv-bg2);
+  border-top: 1px solid var(--aiv-border);
+}
+
+.aiv-wizard-prompt-hint {
+  font-size: 10px;
+  color: var(--aiv-muted);
+  flex: 1;
+}
+
 /* Generate wrap + spinner */
 .aiv-wizard-gen-wrap {
   display: flex;

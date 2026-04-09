@@ -12,6 +12,7 @@ import {
   WizardStageResult,
   WIZARD_STAGE_ORDER,
   WIZARD_STAGE_META,
+  DEFAULT_WIZARD_SETUP,
   buildStoryPrompt,
   buildStoryboardPrompt,
   buildImageGenPrompt,
@@ -52,6 +53,8 @@ export class WizardUI {
   private phase: "list" | "setup" | "stage" = "list";
   private currentStageIdx = 0;
   private isGenerating = false;
+  // User-edited prompt overrides (keyed by stageId)
+  private customPrompts: Partial<Record<WizardStageId, string>> = {};
 
   constructor(root: HTMLElement, apiConfig: ApiConfig, callbacks: WizardCallbacks) {
     this.root = root;
@@ -182,7 +185,8 @@ export class WizardUI {
       { label: "影片生成工具", key: "videoTool",       placeholder: "例：Kling、Sora、Runway、Veo" },
     ];
 
-    const values: Partial<WizardSetup> = {};
+    // Pre-fill with defaults so the user can start immediately
+    const values: WizardSetup = { ...DEFAULT_WIZARD_SETUP };
 
     fields.forEach(({ label, key, placeholder, type }) => {
       const group = document.createElement("div");
@@ -198,14 +202,16 @@ export class WizardUI {
         ta.className = "aiv-var-input aiv-wizard-textarea";
         ta.placeholder = placeholder;
         ta.rows = 3;
-        ta.addEventListener("input", () => { (values[key] as string) = ta.value; });
+        ta.value = values[key];
+        ta.addEventListener("input", () => { values[key] = ta.value; });
         group.appendChild(ta);
       } else {
         const inp = document.createElement("input");
         inp.className = "aiv-var-input";
         inp.type = "text";
         inp.placeholder = placeholder;
-        inp.addEventListener("input", () => { (values[key] as string) = inp.value; });
+        inp.value = values[key];
+        inp.addEventListener("input", () => { values[key] = inp.value; });
         group.appendChild(inp);
       }
 
@@ -326,6 +332,9 @@ export class WizardUI {
         }
       }
     }
+
+    // Editable prompt template (AI API prompt defaults)
+    els.push(this.buildPromptEditor(stageId));
 
     // Content area
     const contentWrap = document.createElement("div");
@@ -461,7 +470,8 @@ export class WizardUI {
     if (!stageId) { this.isGenerating = false; return; }
 
     try {
-      const prompt = this.buildPromptForStage(stageId);
+      // Use user-edited custom prompt if available, otherwise build default
+      const prompt = this.customPrompts[stageId] ?? this.buildPromptForStage(stageId);
       const generated = await this.callApi(prompt);
 
       const result: WizardStageResult = {
@@ -583,6 +593,65 @@ export class WizardUI {
 
     el.append(back, titleEl);
     return el;
+  }
+
+  private buildPromptEditor(stageId: WizardStageId): HTMLElement {
+    const defaultPrompt = this.buildPromptForStage(stageId);
+    const currentPrompt = this.customPrompts[stageId] ?? defaultPrompt;
+    const isCustomized = !!this.customPrompts[stageId];
+
+    const wrap = document.createElement("details");
+    wrap.className = "aiv-wizard-collapsible";
+
+    const summary = document.createElement("summary");
+    summary.className = "aiv-wizard-collapsible-title aiv-wizard-prompt-title";
+    summary.innerHTML = isCustomized
+      ? `📝 AI Prompt 模板 <span class="aiv-wizard-prompt-badge">已自訂</span>`
+      : `📝 AI Prompt 模板（預設）`;
+    wrap.appendChild(summary);
+
+    const body = document.createElement("div");
+    body.className = "aiv-wizard-collapsible-body";
+    body.style.padding = "0";
+
+    const ta = document.createElement("textarea");
+    ta.className = "aiv-wizard-prompt-textarea";
+    ta.value = currentPrompt;
+    ta.rows = 10;
+    ta.addEventListener("input", () => {
+      const val = ta.value;
+      if (val.trim() === defaultPrompt.trim()) {
+        delete this.customPrompts[stageId];
+        summary.innerHTML = `📝 AI Prompt 模板（預設）`;
+      } else {
+        this.customPrompts[stageId] = val;
+        summary.innerHTML = `📝 AI Prompt 模板 <span class="aiv-wizard-prompt-badge">已自訂</span>`;
+      }
+    });
+    body.appendChild(ta);
+
+    const footer = document.createElement("div");
+    footer.className = "aiv-wizard-prompt-footer";
+
+    const resetBtn = document.createElement("button");
+    resetBtn.className = "aiv-btn aiv-btn-outline";
+    resetBtn.style.fontSize = "11px";
+    resetBtn.textContent = "↺ 恢復預設";
+    resetBtn.addEventListener("click", () => {
+      ta.value = defaultPrompt;
+      delete this.customPrompts[stageId];
+      summary.innerHTML = `📝 AI Prompt 模板（預設）`;
+      this.callbacks.onToast("已恢復預設 Prompt", "info");
+    });
+
+    const hint = document.createElement("span");
+    hint.className = "aiv-wizard-prompt-hint";
+    hint.textContent = "修改後下次生成將使用此 Prompt";
+
+    footer.append(resetBtn, hint);
+    body.appendChild(footer);
+    wrap.appendChild(body);
+    return wrap;
   }
 
   private buildCollapsible(label: string, content: string): HTMLElement {

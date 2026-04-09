@@ -42,6 +42,15 @@ export const WIZARD_STAGE_ORDER: WizardStageId[] = [
   "video-prompt",
 ];
 
+export const DEFAULT_WIZARD_SETUP: WizardSetup = {
+  projectName: "我的短影片企劃",
+  initialIdea: "一個年輕人在陌生城市中追夢，歷經挫折後找到自我價值的故事",
+  targetStyle: "電影感、暖色調、寫實風格，帶有微微的懷舊感",
+  targetPlatforms: "YouTube Shorts、TikTok",
+  imageTool: "Midjourney",
+  videoTool: "Kling",
+};
+
 export const WIZARD_STAGE_META: Record<WizardStageId, { icon: string; name: string; desc: string }> = {
   "story":        { icon: "📖", name: "故事大綱",     desc: "建立角色、情節與世界觀" },
   "storyboard":   { icon: "🎞", name: "分鏡腳本",     desc: "場景切分、鏡頭描述、時長規劃" },
