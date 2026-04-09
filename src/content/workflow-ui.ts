@@ -821,7 +821,7 @@ export class WorkflowUI {
     const epInput = document.createElement("input");
     epInput.className = "aiv-var-input";
     epInput.type = "text";
-    epInput.placeholder = "https://generativelanguage.googleapis.com/v1beta/openai";
+    epInput.placeholder = "https://generativelanguage.googleapis.com/v1beta";
     epInput.value = cfg.endpoint;
     epGroup.appendChild(epInput);
     section.appendChild(epGroup);
@@ -848,11 +848,12 @@ export class WorkflowUI {
       testBtn.disabled = true;
       testBtn.textContent = "⏳ 測試中…";
       try {
-        const endpoint = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
-        const res = await fetch(endpoint, {
+        const base = cfg.endpoint.replace(/\/$/, "");
+        const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
+        const res = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cfg.key}` },
-          body: JSON.stringify({ model: cfg.model, messages: [{ role: "user", content: "Hi" }], max_tokens: 10 }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: "Hi" }] }] }),
         });
         if (!res.ok) {
           const err = await res.text();
@@ -877,8 +878,8 @@ export class WorkflowUI {
       const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
       const next: ApiConfig = {
         key: keyInput.value.trim(),
-        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta/openai",
-        model: model || "gemma-3-27b-it",
+        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta",
+        model: model || "gemma-4-31b-it",
         enabled: toggleInput.checked,
       };
       this.apiConfig = next;
@@ -1018,16 +1019,14 @@ export class WorkflowUI {
     const cfg = this.apiConfig;
     if (!cfg || !cfg.key) throw new Error("尚未設定 API 金鑰");
 
-    const endpoint = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
-    const res = await fetch(endpoint, {
+    const base = cfg.endpoint.replace(/\/$/, "");
+    const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
+
+    const res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${cfg.key}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: cfg.model,
-        messages: [{ role: "user", content: prompt }],
+        contents: [{ parts: [{ text: prompt }] }],
       }),
     });
 
@@ -1036,8 +1035,10 @@ export class WorkflowUI {
       throw new Error(`${res.status} ${err.substring(0, 200)}`);
     }
 
-    const data = await res.json() as { choices?: { message?: { content?: string } }[] };
-    const text = data?.choices?.[0]?.message?.content;
+    const data = await res.json() as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[];
+    };
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) throw new Error("API 回應格式異常");
     return text;
   }

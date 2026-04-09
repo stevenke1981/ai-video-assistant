@@ -194,7 +194,7 @@ export interface ApiHistoryEntry {
 
 export const DEFAULT_API_CONFIG: ApiConfig = {
   key: "",
-  endpoint: "https://generativelanguage.googleapis.com/v1beta/openai",
+  endpoint: "https://generativelanguage.googleapis.com/v1beta",
   model: "gemma-4-31b-it",
   enabled: false,
 };
