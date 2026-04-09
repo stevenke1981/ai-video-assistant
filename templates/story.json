@@ -1,0 +1,122 @@
+{
+  "categories": [
+    { "id": "story_world",     "name": "世界觀建構", "icon": "🌍", "order": 0 },
+    { "id": "story_character", "name": "角色設定",   "icon": "👤", "order": 1 },
+    { "id": "story_conflict",  "name": "衝突與轉折", "icon": "⚡", "order": 2 },
+    { "id": "story_theme",     "name": "主題情感",   "icon": "💡", "order": 3 }
+  ],
+  "templates": [
+    {
+      "id": "story-001", "name": "世界觀概述", "stage": "story", "category": "story_world",
+      "content": "在{{時間背景}}的{{地點/世界}}中，整個世界因為{{核心事件}}而發生了劇烈改變。這個世界的基本規則是{{世界規則}}，人們的生活方式是{{日常描述}}。請詳細描述這個世界的風貌、社會結構，以及潛藏的矛盾與危機。",
+      "tags": ["世界觀", "設定", "背景"], "targetTools": ["ChatGPT", "Claude"], "variables": [
+        { "name": "時間背景",  "placeholder": "例：近未來 2087 年" },
+        { "name": "地點/世界", "placeholder": "例：海洋覆蓋 80% 的地球" },
+        { "name": "核心事件",  "placeholder": "例：AI 覺醒革命" },
+        { "name": "世界規則",  "placeholder": "例：情感資料可以被販賣" },
+        { "name": "日常描述",  "placeholder": "例：大多數人生活在浮動城市" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-002", "name": "主角登場", "stage": "story", "category": "story_character",
+      "content": "主角{{姓名}}，{{年齡}}歲，職業是{{職業}}。外表{{外貌特徵}}，內心深處{{內在傷痕}}。他/她最大的優點是{{優點}}，最大的弱點是{{弱點}}。寫一段主角在{{場景}}中的登場描述，展現其獨特個性。",
+      "tags": ["主角", "角色", "登場"], "targetTools": ["ChatGPT", "Claude"], "variables": [
+        { "name": "姓名",     "placeholder": "例：林晴川" },
+        { "name": "年齡",     "placeholder": "例：28" },
+        { "name": "職業",     "placeholder": "例：記憶獵人" },
+        { "name": "外貌特徵", "placeholder": "例：眼神銳利，左手有機械義肢" },
+        { "name": "內在傷痛", "placeholder": "例：失去了最愛的人" },
+        { "name": "優點",     "placeholder": "例：極強的直覺力" },
+        { "name": "弱點",     "placeholder": "例：無法信任他人" },
+        { "name": "場景",     "placeholder": "例：破舊的地下市集" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-003", "name": "衝突爆發", "stage": "story", "category": "story_conflict",
+      "content": "故事進入關鍵轉折點：{{主角}}發現{{衝突核心}}。這個發現讓他/她面臨抉擇：{{選項A}}或{{選項B}}。兩個選擇都有巨大代價。描寫這個衝突場景的緊張氛圍，以及主角內心的掙扎，字數在500字左右。",
+      "tags": ["衝突", "轉折", "高潮"], "targetTools": ["ChatGPT", "Claude", "Grok"], "variables": [
+        { "name": "主角",     "placeholder": "例：林晴川" },
+        { "name": "衝突核心", "placeholder": "例：她的記憶是被植入的假記憶" },
+        { "name": "選項A",    "placeholder": "例：拆穿真相，代價是摧毀一切" },
+        { "name": "選項B",    "placeholder": "例：繼續謊言，保護所愛之人" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-004", "name": "主題陳述", "stage": "story", "category": "story_theme",
+      "content": "這個故事的核心主題是{{核心主題}}。透過{{象徵元素}}作為象徵，探討{{哲學問題}}。請以電影《{{參考電影}}》的風格，寫出一段點題旁白，讓觀眾感受到這個故事想傳達的情感核心：{{情感核心}}。",
+      "tags": ["主題", "情感", "旁白"], "targetTools": ["ChatGPT", "Claude"], "variables": [
+        { "name": "核心主題",  "placeholder": "例：身份認同的消亡" },
+        { "name": "象徵元素",  "placeholder": "例：鏡子與倒影" },
+        { "name": "哲學問題",  "placeholder": "例：記憶決定自我嗎？" },
+        { "name": "參考電影",  "placeholder": "例：銀翼殺手2049" },
+        { "name": "情感核心",  "placeholder": "例：失去才讓存在有意義" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-005", "name": "結局設計", "stage": "story", "category": "story_conflict",
+      "content": "請為以下故事設計一個{{結局類型}}結局：主角{{主角}}在經歷了{{主要旅程}}之後，最終{{結局動作}}。這個結局應該{{情感效果}}，讓觀眾在散場後還能思考{{留白問題}}。請以3個不同版本呈現。",
+      "tags": ["結局", "開放式", "閉合式"], "targetTools": ["ChatGPT", "Claude"], "variables": [
+        { "name": "結局類型",  "placeholder": "例：開放式/閉合式/悲劇" },
+        { "name": "主角",     "placeholder": "例：林晴川" },
+        { "name": "主要旅程",  "placeholder": "例：尋找真實自我的旅途" },
+        { "name": "結局動作",  "placeholder": "例：選擇留在虛假的樂園" },
+        { "name": "情感效果",  "placeholder": "例：既感到釋懷又感到惆悵" },
+        { "name": "留白問題",  "placeholder": "例：她真的自由了嗎？" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-006", "name": "配角塑造", "stage": "story", "category": "story_character",
+      "content": "配角{{名字}}在故事中扮演{{功能角色}}的角色。他/她與主角的關係是{{關係}}，在{{關鍵場景}}中他/她的行動改變了故事走向。請描寫這個配角的背景故事（200字），以及他/她最有代表性的一句台詞。",
+      "tags": ["配角", "立體人物", "關係"], "targetTools": ["ChatGPT", "Claude"], "variables": [
+        { "name": "名字",     "placeholder": "例：陳博士" },
+        { "name": "功能角色", "placeholder": "例：亦師亦敵的導師" },
+        { "name": "關係",     "placeholder": "例：曾是主角的恩師" },
+        { "name": "關鍵場景", "placeholder": "例：地下實驗室的對峙" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-007", "name": "世界規則設定", "stage": "story", "category": "story_world",
+      "content": "請設計{{世界名稱}}的核心規則系統：\n1. 物理規則：{{物理法則}}\n2. 社會規則：{{社會法則}}\n3. 禁忌：{{禁忌}}\n4. 代價：{{違反代價}}\n以條列方式呈現，並舉例說明每條規則如何影響日常生活。",
+      "tags": ["規則", "設定", "世界建構"], "targetTools": ["ChatGPT", "Claude", "Gemini"], "variables": [
+        { "name": "世界名稱",  "placeholder": "例：「情感市場」" },
+        { "name": "物理法則",  "placeholder": "例：時間可以被購買延長" },
+        { "name": "社會法則",  "placeholder": "例：記憶可以作為貨幣" },
+        { "name": "禁忌",     "placeholder": "例：不得複製他人核心記憶" },
+        { "name": "違反代價",  "placeholder": "例：精神熵增，意識崩解" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-008", "name": "對話場景", "stage": "story", "category": "story_conflict",
+      "content": "請寫一段{{人物A}}和{{人物B}}之間的對話，發生在{{場景}}，主題是{{對話目的}}。對話風格：{{風格}}。這段對話應該在表面的{{表面話題}}之中，暗含{{深層衝突}}。長度約15-20輪對話。",
+      "tags": ["對話", "場景", "角色互動"], "targetTools": ["ChatGPT", "Claude"], "variables": [
+        { "name": "人物A",    "placeholder": "例：林晴川" },
+        { "name": "人物B",    "placeholder": "例：陳博士" },
+        { "name": "場景",     "placeholder": "例：雨夜的屋頂" },
+        { "name": "對話目的", "placeholder": "例：A試圖逼問B真相" },
+        { "name": "風格",     "placeholder": "例：克制、危機四伏" },
+        { "name": "表面話題", "placeholder": "例：舊時光的回憶" },
+        { "name": "深層衝突", "placeholder": "例：誰该受到懲罰" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-009", "name": "場景氛圍", "stage": "story", "category": "story_world",
+      "content": "描寫{{場景名稱}}的環境細節，時間是{{時間}}，天氣是{{天氣}}。請從以下感官角度描寫：視覺（色調、光線、構圖）、聽覺（背景音效）、嗅覺、觸覺。這個場景的情緒基調是{{情緒}}，與劇情的關連是{{劇情意義}}。",
+      "tags": ["場景", "氛圍", "感官描寫"], "targetTools": ["ChatGPT", "Claude", "Gemini"], "variables": [
+        { "name": "場景名稱",  "placeholder": "例：廢棄的記憶交易所" },
+        { "name": "時間",     "placeholder": "例：凌晨3點" },
+        { "name": "天氣",     "placeholder": "例：霧雨交加" },
+        { "name": "情緒",     "placeholder": "例：絕望中帶著一絲希望" },
+        { "name": "劇情意義",  "placeholder": "例：主角過去的創傷根源" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "story-010", "name": "三幕結構規劃", "stage": "story", "category": "story_theme",
+      "content": "請按照三幕結構規劃以下故事：\n主角：{{主角}}\n類型：{{類型}}\n主題：{{主題}}\n\n第一幕（建立）：主角的日常、觸發事件、進入新世界\n第二幕（對抗）：試煉升級、盟友/敵人、中點轉折、最低潮\n第三幕（解決）：黎明破曉、高潮對決、尾聲\n\n每幕請給出3個關鍵場景。",
+      "tags": ["三幕結構", "劇本", "規劃"], "targetTools": ["ChatGPT", "Claude"], "variables": [
+        { "name": "主角",  "placeholder": "例：林晴川" },
+        { "name": "類型",  "placeholder": "例：科幻驚悚" },
+        { "name": "主題",  "placeholder": "例：身份認同" }
+      ], "usageCount": 0
+    }
+  ]
+}

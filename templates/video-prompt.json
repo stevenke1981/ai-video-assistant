@@ -1,0 +1,129 @@
+{
+  "categories": [
+    { "id": "vp_motion",  "name": "鏡頭動作",  "icon": "🎥", "order": 0 },
+    { "id": "vp_kling",   "name": "Kling AI",  "icon": "🎬", "order": 1 },
+    { "id": "vp_gen3",    "name": "Gen-3/Sora","icon": "🌟", "order": 2 },
+    { "id": "vp_effects", "name": "特效提示",  "icon": "✨", "order": 3 }
+  ],
+  "templates": [
+    {
+      "id": "vp-001", "name": "鏡頭運動描述", "stage": "video-prompt", "category": "vp_motion",
+      "content": "Camera movement: {{鏡頭運動}}. Starting position: {{起始位置}}. Subject: {{主體}}. Action: {{動作}}. Duration: {{秒數}} seconds. Lighting: {{光線}}. Background: {{背景}}. Overall mood: {{情緒氛圍}}.",
+      "tags": ["鏡頭", "運動", "通用"], "targetTools": ["Kling", "Runway"],
+      "variables": [
+        { "name": "鏡頭運動", "placeholder": "例：slow dolly forward / pan left / crane up" },
+        { "name": "起始位置", "placeholder": "例：wide establishing shot from above" },
+        { "name": "主體",    "placeholder": "例：a lone figure in a red coat" },
+        { "name": "動作",    "placeholder": "例：walking slowly through fog" },
+        { "name": "秒數",    "placeholder": "例：5" },
+        { "name": "光線",    "placeholder": "例：golden hour backlighting" },
+        { "name": "背景",    "placeholder": "例：abandoned city street" },
+        { "name": "情緒氛圍", "placeholder": "例：melancholy, cinematic" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "vp-002", "name": "Kling AI 標準提示", "stage": "video-prompt", "category": "vp_kling",
+      "content": "{{主要描述}}。鏡頭：{{鏡頭類型}}，{{鏡頭運動}}。主體動作：{{動作描述}}。環境：{{環境}}。光線氣氛：{{光線}}。時長：{{秒數}}秒，{{幀率}}fps。風格：{{風格}}。細節：{{細節}}。",
+      "tags": ["Kling", "中文提示", "AI影片"], "targetTools": ["Kling"],
+      "variables": [
+        { "name": "主要描述", "placeholder": "例：一名劍客在竹林中獨自練刀" },
+        { "name": "鏡頭類型", "placeholder": "例：近景特寫" },
+        { "name": "鏡頭運動", "placeholder": "例：緩慢推進" },
+        { "name": "動作描述", "placeholder": "例：快速揮出三刀後停頓" },
+        { "name": "環境",    "placeholder": "例：清晨竹林，陽光透過葉縫" },
+        { "name": "光線",    "placeholder": "例：柔和逆光，充滿詩意" },
+        { "name": "秒數",    "placeholder": "例：5" },
+        { "name": "幀率",    "placeholder": "例：24" },
+        { "name": "風格",    "placeholder": "例：電影質感，中國武俠美學" },
+        { "name": "細節",    "placeholder": "例：衣袂飄動，竹葉隨風" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "vp-003", "name": "Kling 圖生影片提示", "stage": "video-prompt", "category": "vp_kling",
+      "content": "Animate this image: {{圖像描述}}. Motion: {{動態描述}}. Camera: {{鏡頭}}. Physics: {{物理效果}}. Maintain visual consistency with the source image. Subtle, natural movement. {{額外指令}}",
+      "tags": ["Kling", "圖生影片", "i2v"], "targetTools": ["Kling"],
+      "variables": [
+        { "name": "圖像描述", "placeholder": "例：woman standing by a window in rain" },
+        { "name": "動態描述", "placeholder": "例：hair moves gently, raindrops flow down glass" },
+        { "name": "鏡頭",    "placeholder": "例：very slow zoom in toward face" },
+        { "name": "物理效果", "placeholder": "例：realistic rain physics, fabric flutter" },
+        { "name": "額外指令", "placeholder": "例：keep face identity stable, no morphing" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "vp-004", "name": "Runway Gen-3 Alpha", "stage": "video-prompt", "category": "vp_gen3",
+      "content": "{{動態場景描述}}. Camera: {{鏡頭}}. Subject: {{主體動作}}. Environment: {{環境}}. Photorealistic, {{風格}}, cinematic quality, smooth motion, no artifacts. {{Runway專屬指令}}",
+      "tags": ["Runway", "Gen-3", "英文提示"], "targetTools": ["Runway"],
+      "variables": [
+        { "name": "動態場景描述", "placeholder": "例：A spacecraft emerges from hyperspace" },
+        { "name": "鏡頭",      "placeholder": "例：tracking shot following the ship" },
+        { "name": "主體動作",   "placeholder": "例：slowly decelerating, engine glow fading" },
+        { "name": "環境",      "placeholder": "例：deep space, star field, distant nebula" },
+        { "name": "風格",      "placeholder": "例：sci-fi blockbuster VFX" },
+        { "name": "Runway專屬指令","placeholder": "例：high dynamic range, lens flare" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "vp-005", "name": "Sora 描述格式", "stage": "video-prompt", "category": "vp_gen3",
+      "content": "A {{時長}}-second video clip of {{場景}}. The camera {{鏡頭運動}} as {{主體}} {{主體動作}}. The setting is {{環境描述}}. The lighting is {{光線}}. The overall aesthetic is {{美學風格}}, with {{細節補充}}.",
+      "tags": ["Sora", "OpenAI", "英文格式"], "targetTools": ["ChatGPT"],
+      "variables": [
+        { "name": "時長",    "placeholder": "例：10" },
+        { "name": "場景",   "placeholder": "例：an ancient library at midnight" },
+        { "name": "鏡頭運動","placeholder": "例：slowly pushes through the main hall" },
+        { "name": "主體",   "placeholder": "例：a young scholar" },
+        { "name": "主體動作","placeholder": "例：reads a glowing manuscript by candlelight" },
+        { "name": "環境描述","placeholder": "例：towering bookshelves reaching into darkness" },
+        { "name": "光線",   "placeholder": "例：warm amber candlelight with dust particles" },
+        { "name": "美學風格","placeholder": "例：dark academia, highly detailed, photorealistic" },
+        { "name": "細節補充","placeholder": "例：magical runes floating from the pages" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "vp-006", "name": "特效粒子場景", "stage": "video-prompt", "category": "vp_effects",
+      "content": "{{主要場景}}. Special effects: {{特效類型}}. Particles: {{粒子描述}}. Color: {{色彩}}. Motion: {{運動方式}}. Camera: {{鏡頭}}. Style: {{視覺風格}}. Cinematic, high-quality VFX, {{額外效果}}.",
+      "tags": ["特效", "粒子", "VFX"], "targetTools": ["Kling", "Runway"],
+      "variables": [
+        { "name": "主要場景", "placeholder": "例：A mage casting a powerful spell" },
+        { "name": "特效類型", "placeholder": "例：magical energy explosion" },
+        { "name": "粒子描述", "placeholder": "例：thousands of glowing purple particles swirling" },
+        { "name": "色彩",    "placeholder": "例：deep violet and electric blue" },
+        { "name": "運動方式", "placeholder": "例：expanding outward then collapsing inward" },
+        { "name": "鏡頭",    "placeholder": "例：wide shot pulling back rapidly" },
+        { "name": "視覺風格", "placeholder": "例：high fantasy, AAA game cutscene quality" },
+        { "name": "額外效果", "placeholder": "例：shockwave distortion, ground cracking" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "vp-007", "name": "角色動作提示", "stage": "video-prompt", "category": "vp_motion",
+      "content": "{{角色描述}} performing {{動作}}. Body language: {{肢體語言}}. Facial expression: {{表情}}. Movement speed: {{速度}}. Camera follows with a {{鏡頭類型}}, {{鏡頭距離}} distance. Background: {{背景}}. Style: {{風格}}. Motion is fluid and natural.",
+      "tags": ["角色", "動作", "表演"], "targetTools": ["Kling", "Runway"],
+      "variables": [
+        { "name": "角色描述", "placeholder": "例：A tall detective in a long coat" },
+        { "name": "動作",    "placeholder": "例：turning around slowly at the sound of a gunshot" },
+        { "name": "肢體語言", "placeholder": "例：tense, hand reaching for holster" },
+        { "name": "表情",    "placeholder": "例：shock transitioning to cold determination" },
+        { "name": "速度",    "placeholder": "例：starts slow, then rapid" },
+        { "name": "鏡頭類型", "placeholder": "例：handheld tracking shot" },
+        { "name": "鏡頭距離", "placeholder": "例：medium close" },
+        { "name": "背景",    "placeholder": "例：rainy street at night, blurred" },
+        { "name": "風格",    "placeholder": "例：noir thriller, high contrast" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "vp-008", "name": "氛圍影片提示", "stage": "video-prompt", "category": "vp_effects",
+      "content": "Atmospheric {{時段}} scene: {{場景}}. No characters, focus entirely on environment. Ambient motion: {{環境動態}}. Sound design hint: {{聲音}}. Color grade: {{色調}}. Camera: {{鏡頭}}. Mood: {{情緒}}. Slow and meditative, {{額外描述}}.",
+      "tags": ["氛圍", "環境", "空鏡"], "targetTools": ["Kling", "Runway", "Midjourney"],
+      "variables": [
+        { "name": "時段",    "placeholder": "例：dusk / midnight / early morning" },
+        { "name": "場景",    "placeholder": "例：an empty cobblestone street in Paris" },
+        { "name": "環境動態", "placeholder": "例：light rain, puddle ripples, café curtains swaying" },
+        { "name": "聲音",    "placeholder": "例：distant piano, rain, footsteps" },
+        { "name": "色調",    "placeholder": "例：desaturated warm amber" },
+        { "name": "鏡頭",    "placeholder": "例：static wide shot with very subtle drift" },
+        { "name": "情緒",    "placeholder": "例：nostalgic, peaceful solitude" },
+        { "name": "額外描述", "placeholder": "例：reminiscent of a Wong Kar-wai film" }
+      ], "usageCount": 0
+    }
+  ]
+}

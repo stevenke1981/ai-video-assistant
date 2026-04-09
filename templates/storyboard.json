@@ -1,0 +1,99 @@
+{
+  "categories": [
+    { "id": "sb_scene",    "name": "場景分解",  "icon": "🎞", "order": 0 },
+    { "id": "sb_shot",     "name": "鏡頭設計",  "icon": "🎥", "order": 1 },
+    { "id": "sb_trans",    "name": "轉場設計",  "icon": "✂️", "order": 2 },
+    { "id": "sb_sequence", "name": "序列編排",  "icon": "📋", "order": 3 }
+  ],
+  "templates": [
+    {
+      "id": "sb-001", "name": "場景鏡頭清單", "stage": "storyboard", "category": "sb_scene",
+      "content": "請為以下場景設計詳細分鏡清單：\n\n場景：{{場景描述}}\n情緒基調：{{情緒}}\n持續時間：{{時長}}秒\n\n請列出每個鏡頭的：\n- 鏡頭編號\n- 景別（特寫/中景/遠景等）\n- 鏡頭運動（固定/搖鏡/推鏡/拉鏡/跟鏡）\n- 畫面描述\n- 時間（秒）\n- 角色動作\n- 台詞或音效\n\n共設計8-12個鏡頭。",
+      "tags": ["分鏡", "鏡頭清單", "場景"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "場景描述", "placeholder": "例：主角在廢棄工廠發現秘密文件" },
+        { "name": "情緒",    "placeholder": "例：緊張、懸疑" },
+        { "name": "時長",    "placeholder": "例：90" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "sb-002", "name": "開場序列設計", "stage": "storyboard", "category": "sb_sequence",
+      "content": "設計一個{{風格}}風格的電影開場，時長{{時長}}秒。\n\n建立資訊：{{需要建立的資訊}}\n氛圍：{{氛圍}}\n\n請設計：\n1. 畫外音或字幕卡（如有）\n2. 開場鏡頭序列（6-8個鏡頭）\n3. 配樂建議\n4. 節奏說明（快切/慢鏡）\n5. 如何引發觀眾好奇",
+      "tags": ["開場", "序列", "第一印象"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "風格",         "placeholder": "例：新黑色電影" },
+        { "name": "時長",         "placeholder": "例：120" },
+        { "name": "需要建立的資訊", "placeholder": "例：世界觀、主角困境" },
+        { "name": "氛圍",         "placeholder": "例：壓抑、迷失" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "sb-003", "name": "動作場景分鏡", "stage": "storyboard", "category": "sb_scene",
+      "content": "為以下動作場景設計分鏡：\n\n動作內容：{{動作描述}}\n場地：{{場地}}\n參與角色：{{角色}}\n核心情感：{{情感}}\n\n重點需求：\n- 使用{{剪接節奏}}剪接節奏\n- 加入{{特色鏡頭}}特色鏡頭\n- 高潮定格鏡頭設計\n- 如何讓動作有情感重量",
+      "tags": ["動作", "打鬥", "追逐"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "動作描述",  "placeholder": "例：主角徒手闖破三道安保" },
+        { "name": "場地",     "placeholder": "例：霓虹燈照耀的地下走廊" },
+        { "name": "角色",     "placeholder": "例：主角 vs 3名警衛" },
+        { "name": "情感",     "placeholder": "例：憤怒推動的衝動行動" },
+        { "name": "剪接節奏",  "placeholder": "例：快速交叉" },
+        { "name": "特色鏡頭",  "placeholder": "例：慢動作反應鏡頭" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "sb-004", "name": "對話場景分鏡", "stage": "storyboard", "category": "sb_shot",
+      "content": "為以下對話場景設計分鏡：\n\n對話雙方：{{人物A}}和{{人物B}}\n地點：{{地點}}\n對話目的：{{目的}}\n情緒走向：{{情緒走向}}\n\n請說明：\n- 初始構圖設置（OTS/正反打/其他）\n- 每個情緒轉折點的鏡頭變化\n- 人物位置與力量對比\n- 環境如何反映心理狀態",
+      "tags": ["對話", "正反打", "雙人鏡頭"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "人物A",   "placeholder": "例：主角" },
+        { "name": "人物B",   "placeholder": "例：反派" },
+        { "name": "地點",    "placeholder": "例：高空辦公室" },
+        { "name": "目的",    "placeholder": "例：主角試圖說服反派停手" },
+        { "name": "情緒走向", "placeholder": "例：從冷靜到崩潰到平靜" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "sb-005", "name": "轉場方式設計", "stage": "storyboard", "category": "sb_trans",
+      "content": "為以下場景轉換設計創意轉場：\n\n場景A：{{場景A}}\n場景B：{{場景B}}\n時間跨越：{{時間跨越}}\n主題關聯：{{主題關聯}}\n\n請提供5種不同轉場方案（包含：技術方法、視覺描述、情感效果），並說明最推薦的方案及原因。",
+      "tags": ["轉場", "剪接", "創意"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "場景A",   "placeholder": "例：兒時家園（過去）" },
+        { "name": "場景B",   "placeholder": "例：廢墟遺址（現在）" },
+        { "name": "時間跨越", "placeholder": "例：20年" },
+        { "name": "主題關聯", "placeholder": "例：失去與殘存" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "sb-006", "name": "情緒鏡頭語言", "stage": "storyboard", "category": "sb_shot",
+      "content": "設計用於表達{{情緒}}的視覺鏡頭語言系統：\n\n角色：{{角色}}\n情境：{{情境}}\n\n請說明：\n1. 色彩調度（飽和度、色調偏移）\n2. 鏡頭焦距選擇\n3. 構圖規則（打破或遵循）\n4. 光線設置\n5. 鏡頭運動\n6. 節奏（剪接頻率）\n7. 具體鏡頭範例（3個）",
+      "tags": ["情緒", "色彩", "光線", "構圖"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "情緒",  "placeholder": "例：崩潰前的平靜" },
+        { "name": "角色",  "placeholder": "例：林晴川" },
+        { "name": "情境",  "placeholder": "例：得知真相後的獨處" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "sb-007", "name": "高潮場景分鏡", "stage": "storyboard", "category": "sb_sequence",
+      "content": "為故事最高潮場景設計完整分鏡腳本：\n\n高潮事件：{{高潮事件}}\n涉及角色：{{角色}}\n情感高峰：{{情感高峰}}\n視覺奇觀：{{視覺元素}}\n\n請設計完整鏡頭序列（12-20個鏡頭），重點包含：\n- 節奏建構（如何達到最高點）\n- 決定性鏡頭的設計\n- 震撼感的視覺製造\n- 情感落點",
+      "tags": ["高潮", "決定性時刻", "視覺震撼"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "高潮事件",  "placeholder": "例：主角選擇自我犧牲" },
+        { "name": "角色",     "placeholder": "例：主角、反派、盟友" },
+        { "name": "情感高峰",  "placeholder": "例：犧牲與救贖共存" },
+        { "name": "視覺元素",  "placeholder": "例：爆炸、雨中、逆光" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "sb-008", "name": "蒙太奇序列", "stage": "storyboard", "category": "sb_sequence",
+      "content": "設計一段{{主題}}蒙太奇序列，時長{{時長}}秒。\n\n目的：{{敘事目的}}\n節奏：{{音樂節拍}}配合\n\n請列出10-15個鏡頭，每個鏡頭包含：\n- 畫面內容\n- 時間長度（秒）\n- 與主題的隱喻關係\n以及整體說明這段蒙太奇如何服務故事。",
+      "tags": ["蒙太奇", "剪接詩학", "主題"], "targetTools": ["ChatGPT", "Claude"],
+      "variables": [
+        { "name": "主題",   "placeholder": "例：時間流逝" },
+        { "name": "時長",   "placeholder": "例：60" },
+        { "name": "敘事目的", "placeholder": "例：展現主角的成長歷程" },
+        { "name": "音樂節拍", "placeholder": "例：3/4拍，慢板" }
+      ], "usageCount": 0
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "AI 影片製作助手",
+  "version": "1.0.0",
+  "description": "在 AI 聊天平台注入側邊欄，協助完成故事生成 → 分鏡腳本 → 圖像 Prompt → 影片 Prompt 的完整影片創作工作流程。",
+  "permissions": ["storage", "activeTab", "clipboardRead", "clipboardWrite"],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://grok.com/*",
+    "https://gemini.google.com/*",
+    "https://chatgpt.com/*",
+    "https://claude.ai/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"
+  },
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/i/grok*",
+        "https://grok.com/*",
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*",
+        "https://claude.ai/*"
+      ],
+      "js": ["content.js"],
+      "css": ["sidebar.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "commands": {
+    "toggle-sidebar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+V",
+        "mac": "Command+Shift+V"
+      },
+      "description": "切換 AI 影片助手側邊欄"
+    }
+  }
+}

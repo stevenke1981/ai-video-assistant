@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 影片製作助手</title>
+  <style>
+    :root {
+      --brand: #7c3aed;
+      --brand-light: #ede9fe;
+      --text: #1e1b4b;
+      --muted: #6b7280;
+      --bg: #ffffff;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 300px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: var(--brand);
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    header .logo { font-size: 22px; }
+    header .title { font-weight: 700; font-size: 15px; line-height: 1.2; }
+    header .subtitle { font-size: 11px; opacity: .8; }
+    .body { padding: 16px; }
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .88; }
+    .btn.secondary {
+      background: var(--brand-light);
+      color: var(--brand);
+    }
+    .shortcut {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 8px;
+    }
+    kbd {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 11px;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 12px 0;
+    }
+    .platforms { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .platform-chip {
+      background: var(--brand-light);
+      color: var(--brand);
+      border-radius: 99px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .footer {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      padding: 8px 16px 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="logo">🎬</span>
+    <div>
+      <div class="title">AI 影片製作助手</div>
+      <div class="subtitle">AI Video Production Assistant</div>
+    </div>
+  </header>
+
+  <div class="body">
+    <button id="btn-open" class="btn">🎬 開啟側邊欄</button>
+    <button id="btn-history" class="btn secondary">📋 查看提示詞歷史</button>
+
+    <hr class="divider" />
+
+    <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">支援平台：</div>
+    <div class="platforms">
+      <span class="platform-chip">Grok</span>
+      <span class="platform-chip">Gemini</span>
+      <span class="platform-chip">ChatGPT</span>
+      <span class="platform-chip">Claude</span>
+    </div>
+
+    <hr class="divider" />
+
+    <p class="shortcut">按 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> 快速切換側邊欄</p>
+  </div>
+
+  <div class="footer">v1.0.0 · AI 影片製作助手</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,826 @@
+/* =========================================================
+   AI 影片製作助手 — Sidebar Styles
+   Prefix: aiv-
+   Brand color: #7c3aed (violet)
+   ========================================================= */
+
+/* ── Reset & Scope ─────────────────────────────────── */
+#aiv-root *,
+#aiv-root *::before,
+#aiv-root *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── CSS Variables ─────────────────────────────────── */
+#aiv-root {
+  --aiv-brand:       #7c3aed;
+  --aiv-brand-dark:  #5b21b6;
+  --aiv-brand-light: #ede9fe;
+  --aiv-brand-muted: #a78bfa;
+  --aiv-accent:      #10b981; /* green for "send" actions */
+
+  --aiv-bg:          #ffffff;
+  --aiv-bg2:         #f5f3ff;
+  --aiv-bg3:         #f9fafb;
+  --aiv-border:      #e5e7eb;
+  --aiv-text:        #1e1b4b;
+  --aiv-muted:       #6b7280;
+  --aiv-warn:        #f59e0b;
+  --aiv-error:       #ef4444;
+
+  --aiv-shadow:      0 4px 24px rgba(0,0,0,.12);
+  --aiv-radius:      12px;
+  --aiv-radius-sm:   8px;
+  --aiv-transition:  .18s ease;
+
+  --aiv-w:           360px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #aiv-root[data-theme="auto"],
+  #aiv-root[data-theme="dark"] {
+    --aiv-bg:     #12111a;
+    --aiv-bg2:    #1e1b2e;
+    --aiv-bg3:    #1a1827;
+    --aiv-border: #2d2b40;
+    --aiv-text:   #e9d5ff;
+    --aiv-muted:  #9ca3af;
+  }
+}
+
+#aiv-root[data-theme="dark"] {
+  --aiv-bg:     #12111a;
+  --aiv-bg2:    #1e1b2e;
+  --aiv-bg3:    #1a1827;
+  --aiv-border: #2d2b40;
+  --aiv-text:   #e9d5ff;
+  --aiv-muted:  #9ca3af;
+}
+
+/* ── Sidebar Shell ─────────────────────────────────── */
+#aiv-root {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--aiv-w);
+  height: 100vh;
+  z-index: 2147483640;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  color: var(--aiv-text);
+  background: var(--aiv-bg);
+  box-shadow: var(--aiv-shadow);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--aiv-transition);
+}
+
+#aiv-root.aiv-hidden {
+  transform: translateX(calc(var(--aiv-w) + 20px));
+}
+
+/* ── Header ────────────────────────────────────────── */
+.aiv-header {
+  background: linear-gradient(135deg, var(--aiv-brand) 0%, var(--aiv-brand-dark) 100%);
+  color: #fff;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.aiv-header-logo { font-size: 20px; line-height: 1; }
+
+.aiv-header-title {
+  flex: 1;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.aiv-header-title small {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  opacity: .75;
+}
+
+.aiv-header-actions { display: flex; gap: 4px; }
+
+.aiv-icon-btn {
+  background: rgba(255,255,255,.15);
+  border: none;
+  color: #fff;
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: background var(--aiv-transition);
+}
+.aiv-icon-btn:hover { background: rgba(255,255,255,.28); }
+
+/* ── Platform Badge ────────────────────────────────── */
+.aiv-platform-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255,255,255,.2);
+  border-radius: 99px;
+  padding: 2px 8px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ── Tabs ──────────────────────────────────────────── */
+.aiv-tab-bar {
+  display: flex;
+  background: var(--aiv-bg2);
+  border-bottom: 1px solid var(--aiv-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.aiv-tab-bar::-webkit-scrollbar { display: none; }
+
+.aiv-tab-btn {
+  flex: 1;
+  min-width: 52px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 4px;
+  cursor: pointer;
+  color: var(--aiv-muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  transition: color var(--aiv-transition), border-color var(--aiv-transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.aiv-tab-btn .aiv-tab-icon { font-size: 16px; }
+
+.aiv-tab-btn:hover { color: var(--aiv-brand); }
+
+.aiv-tab-btn.active {
+  color: var(--aiv-brand);
+  border-bottom-color: var(--aiv-brand);
+}
+
+/* ── Scrollable Body ───────────────────────────────── */
+.aiv-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--aiv-brand-muted) transparent;
+}
+.aiv-body::-webkit-scrollbar { width: 4px; }
+.aiv-body::-webkit-scrollbar-thumb { background: var(--aiv-brand-muted); border-radius: 4px; }
+
+/* ── Section Labels ────────────────────────────────── */
+.aiv-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--aiv-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 2px 0;
+}
+
+/* ── Feature #1: Video Tools Panel ─────────────────── */
+.aiv-tool-panel {
+  background: var(--aiv-bg2);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 8px;
+}
+
+.aiv-tool-panel .aiv-section-label { margin-bottom: 6px; }
+
+.aiv-tool-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.aiv-tool-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--aiv-bg);
+  border: 1px solid var(--aiv-border);
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--aiv-text);
+  cursor: pointer;
+  transition: background var(--aiv-transition), border-color var(--aiv-transition);
+  text-decoration: none;
+}
+.aiv-tool-chip:hover {
+  background: var(--aiv-brand-light);
+  border-color: var(--aiv-brand);
+  color: var(--aiv-brand);
+}
+
+/* ── Feature #9: Smart Tool Filter ─────────────────── */
+.aiv-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.aiv-filter-chip {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: 99px;
+  padding: 3px 9px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--aiv-muted);
+  transition: background var(--aiv-transition), color var(--aiv-transition), border-color var(--aiv-transition);
+}
+.aiv-filter-chip.active,
+.aiv-filter-chip:hover {
+  background: var(--aiv-brand-light);
+  color: var(--aiv-brand);
+  border-color: var(--aiv-brand);
+}
+
+/* ── Search Box ────────────────────────────────────── */
+.aiv-search {
+  display: flex;
+  align-items: center;
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: 8px;
+  padding: 0 10px;
+  gap: 6px;
+}
+
+.aiv-search input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 7px 0;
+  font-size: 12px;
+  color: var(--aiv-text);
+}
+
+.aiv-search input::placeholder { color: var(--aiv-muted); }
+
+.aiv-search .aiv-search-icon { font-size: 13px; color: var(--aiv-muted); }
+
+/* ── Category Tabs ─────────────────────────────────── */
+.aiv-cat-bar {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.aiv-cat-btn {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--aiv-muted);
+  transition: all var(--aiv-transition);
+}
+.aiv-cat-btn.active {
+  background: var(--aiv-brand);
+  border-color: var(--aiv-brand);
+  color: #fff;
+}
+
+/* ── Template Cards ────────────────────────────────── */
+.aiv-card {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 10px;
+  cursor: pointer;
+  transition: border-color var(--aiv-transition), box-shadow var(--aiv-transition);
+  position: relative;
+}
+
+.aiv-card:hover {
+  border-color: var(--aiv-brand-muted);
+  box-shadow: 0 2px 8px rgba(124,58,237,.12);
+}
+
+.aiv-card.pinned { border-left: 3px solid var(--aiv-brand); }
+
+.aiv-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.aiv-card-name {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--aiv-text);
+  flex: 1;
+  line-height: 1.3;
+}
+
+.aiv-card-actions { display: flex; gap: 3px; flex-shrink: 0; }
+
+.aiv-card-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--aiv-muted);
+  padding: 2px;
+  border-radius: 4px;
+  transition: color var(--aiv-transition), background var(--aiv-transition);
+  line-height: 1;
+}
+.aiv-card-btn:hover { color: var(--aiv-brand); background: var(--aiv-brand-light); }
+.aiv-card-btn.active { color: var(--aiv-brand); }
+
+.aiv-card-preview {
+  font-size: 11px;
+  color: var(--aiv-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+  margin-bottom: 5px;
+}
+
+.aiv-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.aiv-tag {
+  background: var(--aiv-brand-light);
+  color: var(--aiv-brand-dark);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.aiv-usage-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--aiv-muted);
+}
+
+/* ── Template Detail / Variable Filler ─────────────── */
+.aiv-detail {
+  background: var(--aiv-bg2);
+  border: 1px solid var(--aiv-brand-muted);
+  border-radius: var(--aiv-radius);
+  padding: 12px;
+}
+
+.aiv-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.aiv-back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--aiv-brand);
+  padding: 2px 4px;
+}
+
+.aiv-detail-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--aiv-text);
+  flex: 1;
+}
+
+.aiv-var-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+
+.aiv-var-group { display: flex; flex-direction: column; gap: 3px; }
+
+.aiv-var-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--aiv-brand);
+}
+
+.aiv-var-input {
+  width: 100%;
+  background: var(--aiv-bg);
+  border: 1px solid var(--aiv-border);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 12px;
+  color: var(--aiv-text);
+  outline: none;
+  transition: border-color var(--aiv-transition);
+}
+.aiv-var-input:focus { border-color: var(--aiv-brand); }
+
+.aiv-preview-box {
+  background: var(--aiv-bg);
+  border: 1px solid var(--aiv-border);
+  border-radius: 6px;
+  padding: 9px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--aiv-text);
+  max-height: 120px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.aiv-preview-box mark {
+  background: var(--aiv-brand-light);
+  color: var(--aiv-brand);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+/* ── Feature #6: Bilingual Toggle ───────────────────── */
+.aiv-bilingual-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--aiv-muted);
+  margin-bottom: 6px;
+}
+
+.aiv-toggle {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  cursor: pointer;
+}
+.aiv-toggle input { opacity: 0; width: 0; height: 0; }
+.aiv-toggle-track {
+  position: absolute; inset: 0;
+  background: var(--aiv-border);
+  border-radius: 99px;
+  transition: background var(--aiv-transition);
+}
+.aiv-toggle input:checked + .aiv-toggle-track { background: var(--aiv-brand); }
+.aiv-toggle-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--aiv-transition);
+}
+.aiv-toggle input:checked ~ .aiv-toggle-thumb { transform: translateX(16px); }
+
+/* ── Action Buttons ────────────────────────────────── */
+.aiv-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--aiv-transition), transform var(--aiv-transition);
+  width: 100%;
+}
+.aiv-btn:hover { opacity: .88; }
+.aiv-btn:active { transform: scale(.97); }
+
+.aiv-btn-primary { background: var(--aiv-brand); color: #fff; }
+.aiv-btn-send    { background: var(--aiv-accent); color: #fff; }
+.aiv-btn-outline {
+  background: none;
+  border: 1.5px solid var(--aiv-border);
+  color: var(--aiv-text);
+}
+.aiv-btn-outline:hover { border-color: var(--aiv-brand); color: var(--aiv-brand); }
+
+.aiv-btn-row { display: flex; gap: 6px; }
+.aiv-btn-row .aiv-btn { flex: 1; }
+
+/* ── Feature #3: Chain to Next Stage ────────────────── */
+.aiv-chain-bar {
+  background: var(--aiv-brand-light);
+  border: 1px dashed var(--aiv-brand-muted);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--aiv-brand-dark);
+  font-weight: 600;
+}
+
+.aiv-chain-bar .aiv-chain-arrow { font-size: 14px; }
+
+.aiv-chain-btn {
+  margin-left: auto;
+  background: var(--aiv-brand);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--aiv-transition);
+}
+.aiv-chain-btn:hover { opacity: .88; }
+
+/* ── Feature #2: Image Capture ──────────────────────── */
+.aiv-image-capture {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aiv-captured-thumb {
+  width: 48px; height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--aiv-border);
+  flex-shrink: 0;
+}
+
+.aiv-capture-info { flex: 1; font-size: 11px; color: var(--aiv-muted); line-height: 1.4; }
+
+.aiv-capture-btn {
+  background: var(--aiv-brand);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── Feature #4: Style Preset ───────────────────────── */
+.aiv-style-panel {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 8px 10px;
+}
+
+.aiv-style-panel .aiv-section-label { margin-bottom: 6px; }
+
+.aiv-style-select {
+  width: 100%;
+  background: var(--aiv-bg);
+  border: 1px solid var(--aiv-border);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 12px;
+  color: var(--aiv-text);
+  outline: none;
+}
+
+/* ── Feature #5: Scene List / Duration ──────────────── */
+.aiv-scene-list { display: flex; flex-direction: column; gap: 6px; }
+
+.aiv-scene-item {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color var(--aiv-transition);
+}
+.aiv-scene-item:hover { border-color: var(--aiv-brand-muted); }
+.aiv-scene-item.active { border-color: var(--aiv-brand); }
+
+.aiv-scene-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+
+.aiv-scene-num {
+  background: var(--aiv-brand);
+  color: #fff;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.aiv-scene-desc {
+  flex: 1;
+  font-size: 11px;
+  color: var(--aiv-text);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aiv-scene-duration {
+  font-size: 10px;
+  color: var(--aiv-muted);
+  white-space: nowrap;
+}
+
+.aiv-duration-summary {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--aiv-brand);
+  text-align: right;
+}
+
+/* ── Feature #8: Export Bar ─────────────────────────── */
+.aiv-export-bar {
+  display: flex;
+  gap: 6px;
+  border-top: 1px solid var(--aiv-border);
+  padding-top: 8px;
+}
+
+/* ── Feature #10: History View ──────────────────────── */
+.aiv-history-list { display: flex; flex-direction: column; gap: 5px; }
+
+.aiv-history-item {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color var(--aiv-transition);
+}
+.aiv-history-item:hover { border-color: var(--aiv-brand-muted); }
+
+.aiv-history-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.aiv-history-stage {
+  background: var(--aiv-brand-light);
+  color: var(--aiv-brand-dark);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.aiv-history-time {
+  font-size: 10px;
+  color: var(--aiv-muted);
+  margin-left: auto;
+}
+
+.aiv-history-preview {
+  font-size: 11px;
+  color: var(--aiv-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+/* ── Project Selector ────────────────────────────────── */
+.aiv-project-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--aiv-bg2);
+  border-bottom: 1px solid var(--aiv-border);
+  padding: 6px 10px;
+  flex-shrink: 0;
+}
+
+.aiv-project-name {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--aiv-brand);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aiv-project-btn {
+  background: none;
+  border: 1px solid var(--aiv-border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--aiv-muted);
+  transition: all var(--aiv-transition);
+}
+.aiv-project-btn:hover { border-color: var(--aiv-brand); color: var(--aiv-brand); }
+
+/* ── Toast Notifications ────────────────────────────── */
+.aiv-toast-container {
+  position: fixed;
+  bottom: 16px;
+  right: calc(var(--aiv-w) + 12px);
+  z-index: 2147483641;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.aiv-toast {
+  background: var(--aiv-text);
+  color: var(--aiv-bg);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .2s, transform .2s;
+  pointer-events: auto;
+  max-width: 220px;
+}
+
+.aiv-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.aiv-toast.success { background: var(--aiv-accent); color: #fff; }
+.aiv-toast.error   { background: var(--aiv-error); color: #fff; }
+
+/* ── Empty State ─────────────────────────────────────── */
+.aiv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  gap: 8px;
+  color: var(--aiv-muted);
+  text-align: center;
+}
+
+.aiv-empty-icon { font-size: 32px; }
+.aiv-empty-title { font-size: 13px; font-weight: 700; }
+.aiv-empty-desc { font-size: 11px; line-height: 1.6; }
+
+/* ── Resize Handle ───────────────────────────────────── */
+.aiv-resize-handle {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 8px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 10;
+}
+
+.aiv-resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 32px;
+  background: var(--aiv-brand-muted);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity var(--aiv-transition);
+}
+
+.aiv-resize-handle:hover::after { opacity: .7; }

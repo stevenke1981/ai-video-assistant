@@ -1,0 +1,90 @@
+{
+  "categories": [
+    { "id": "imggen_char",  "name": "角色生成",  "icon": "👤", "order": 0 },
+    { "id": "imggen_scene", "name": "場景生成",  "icon": "🌆", "order": 1 },
+    { "id": "imggen_style", "name": "風格轉換",  "icon": "🎨", "order": 2 },
+    { "id": "imggen_thumb", "name": "縮圖設計",  "icon": "🖼", "order": 3 }
+  ],
+  "templates": [
+    {
+      "id": "ig-001", "name": "角色一致性生成", "stage": "image-gen", "category": "imggen_char",
+      "content": "為以下角色生成一致性形象：\n\n角色名：{{角色名}}\n性別/年齡：{{性別年齡}}\n外貌特徵：{{外貌}}\n服裝：{{服裝}}\n個性表現：{{個性}}\n\n請生成4個不同角度的角色圖像提示（正面、側面、四分之三、特寫），保持以下元素一致：外貌、服裝配色、氣質。每個提示都加入：照明類型、背景設置、藝術風格{{藝術風格}}。",
+      "tags": ["角色", "一致性", "多角度"], "targetTools": ["Midjourney", "Flux", "DALL-E"],
+      "variables": [
+        { "name": "角色名",   "placeholder": "例：林晴川" },
+        { "name": "性別年齡", "placeholder": "例：女性，28歲" },
+        { "name": "外貌",    "placeholder": "例：短黑髮，銳利眼神，左臂機械義肢" },
+        { "name": "服裝",    "placeholder": "例：暗紫色風衣，黑色戰術背心" },
+        { "name": "個性",    "placeholder": "例：冷靜中帶著隱藏的哀傷" },
+        { "name": "藝術風格", "placeholder": "例：電影人物概念藝術，寫實風格" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ig-002", "name": "環境場景生成", "stage": "image-gen", "category": "imggen_scene",
+      "content": "生成以下場景的環境概念圖：\n\n場景：{{場景名稱}}\n時間：{{時間}}\n天氣/光線：{{光線}}\n色調：{{色調}}\n風格：{{視覺風格}}\n\n畫面重點：{{視覺重點}}\n\n附加需求：超高細節，電影場景概念藝術，攝影寫實，16:9 比例，適合作為影片場景參考。",
+      "tags": ["場景", "環境", "概念藝術"], "targetTools": ["Midjourney", "Stable Diffusion", "Flux"],
+      "variables": [
+        { "name": "場景名稱",  "placeholder": "例：霓虹燈地下市集" },
+        { "name": "時間",     "placeholder": "例：深夜" },
+        { "name": "光線",     "placeholder": "例：霓虹燈反射在潮濕地面" },
+        { "name": "色調",     "placeholder": "例：藍色系夜景，高反差" },
+        { "name": "視覺風格",  "placeholder": "例：賽博朋克寫實風" },
+        { "name": "視覺重點",  "placeholder": "例：前景有小販攤位，背景是巨型廣告牌" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ig-003", "name": "圖像風格轉換提示", "stage": "image-gen", "category": "imggen_style",
+      "content": "將以下圖像轉換為指定風格：\n\n原始圖像描述：{{原始圖像}}\n目標風格：{{目標風格}}\n保留元素：{{保留元素}}\n風格強度：{{風格強度}}%\n\n生成風格轉換提示，確保：\n- 風格關鍵詞：{{風格關鍵詞}}\n- 色彩調節：{{色彩調節}}\n- 紋理描述：{{紋理}}\n- 參考藝術家/電影：{{參考來源}}",
+      "tags": ["風格轉換", "img2img", "風格化"], "targetTools": ["Stable Diffusion", "Midjourney", "Flux"],
+      "variables": [
+        { "name": "原始圖像",  "placeholder": "例：現代都市街道日景" },
+        { "name": "目標風格",  "placeholder": "例：吉卜力工作室動畫風格" },
+        { "name": "保留元素",  "placeholder": "例：建築結構、人物姿勢" },
+        { "name": "風格強度",  "placeholder": "例：80" },
+        { "name": "風格關鍵詞", "placeholder": "例：hand-drawn anime，soft colors" },
+        { "name": "色彩調節",  "placeholder": "例：柔和暖色調，奶油色系" },
+        { "name": "紋理",     "placeholder": "例：水彩質感，手繪線條" },
+        { "name": "參考來源",  "placeholder": "例：宮崎駿，風之谷" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ig-004", "name": "影片縮圖設計", "stage": "image-gen", "category": "imggen_thumb",
+      "content": "設計一張{{平台}}影片縮圖：\n\n影片主題：{{主題}}\n目標受眾：{{受眾}}\n核心視覺：{{核心視覺}}\n文字標題：{{標題文字}}\n\n縮圖設計要求：\n- 比例：{{比例}}\n- 色彩衝擊：高對比色，{{主色調}}\n- 表情/動作：誇張且吸引眼球\n- 背景：{{背景設計}}\n- 生成一個可以直接使用的圖像提示",
+      "tags": ["縮圖", "YouTube", "行銷"], "targetTools": ["DALL-E", "Midjourney", "Flux"],
+      "variables": [
+        { "name": "平台",   "placeholder": "例：YouTube" },
+        { "name": "主題",   "placeholder": "例：AI工具評測" },
+        { "name": "受眾",   "placeholder": "例：科技愛好者" },
+        { "name": "核心視覺", "placeholder": "例：震驚的人臉與AI機器人對比" },
+        { "name": "標題文字", "placeholder": "例：這個AI太可怕了！" },
+        { "name": "比例",   "placeholder": "例：16:9（1280x720）" },
+        { "name": "主色調",  "placeholder": "例：紅色+黑色" },
+        { "name": "背景設計", "placeholder": "例：漸層光效背景" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ig-005", "name": "角色情緒表情包", "stage": "image-gen", "category": "imggen_char",
+      "content": "為角色{{角色名}}生成情緒表情包系列（6種表情）：\n\n角色描述：{{外觀描述}}\n藝術風格：{{風格}}\n\n需要的表情：\n1. 驚訝（眼睛放大，嘴微開）\n2. 憤怒（眉頭緊鎖，牙關咬緊）\n3. 悲傷（眼角下垂，目光失神）\n4. 喜悅（大笑，眼角有淚花）\n5. 冷靜（平靜表情，微微抬下巴）\n6. 困惑（單邊眉毛抬起）\n\n每個表情需為半身像，白色背景，保持角色一致性。",
+      "tags": ["表情包", "角色", "情緒"], "targetTools": ["Midjourney", "DALL-E", "Flux"],
+      "variables": [
+        { "name": "角色名",   "placeholder": "例：林晴川" },
+        { "name": "外觀描述", "placeholder": "例：短黑髮女性，機械義肢" },
+        { "name": "風格",    "placeholder": "例：animé細緻寫實風" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ig-006", "name": "連續分鏡圖像", "stage": "image-gen", "category": "imggen_scene",
+      "content": "為以下故事段落生成連續分鏡圖像提示（4格）：\n\n故事段落：{{故事段落}}\n視覺風格：{{視覺風格}}\n色調一致性：{{色調}}\n\n每格圖像要求：\n- 鏡頭1：{{鏡頭1描述}}\n- 鏡頭2：{{鏡頭2描述}}\n- 鏡頭3：{{鏡頭3描述}}\n- 鏡頭4：{{鏡頭4描述}}\n\n所有圖像須保持角色外觀一致、光線連續、場景空間合理。",
+      "tags": ["連續鏡頭", "分鏡圖", "一致性"], "targetTools": ["Midjourney", "Flux"],
+      "variables": [
+        { "name": "故事段落",   "placeholder": "例：主角發現秘密房間" },
+        { "name": "視覺風格",   "placeholder": "例：電影感，攝影寫實" },
+        { "name": "色調",      "placeholder": "例：低對比，偏冷色" },
+        { "name": "鏡頭1描述",  "placeholder": "例：主角從遠處看見光線透出的門" },
+        { "name": "鏡頭2描述",  "placeholder": "例：主角靠近，手觸摸門把" },
+        { "name": "鏡頭3描述",  "placeholder": "例：門打開，室內光線湧出" },
+        { "name": "鏡頭4描述",  "placeholder": "例：主角踏入，看見震驚的景象" }
+      ], "usageCount": 0
+    }
+  ]
+}

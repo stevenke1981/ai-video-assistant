@@ -1,0 +1,101 @@
+{
+  "categories": [
+    { "id": "ip_mj",   "name": "Midjourney",      "icon": "🎨", "order": 0 },
+    { "id": "ip_flux", "name": "Flux / SD",        "icon": "⚡", "order": 1 },
+    { "id": "ip_dalle","name": "DALL-E / GPT-4o",  "icon": "🤖", "order": 2 },
+    { "id": "ip_grok", "name": "Grok Aurora",      "icon": "✦",  "order": 3 }
+  ],
+  "templates": [
+    {
+      "id": "ip-001", "name": "Midjourney 寫實人像", "stage": "image-prompt", "category": "ip_mj",
+      "content": "{{主要描述}}, {{種族}}female, {{年齡}}s, {{髮型}} hair, {{眼睛顏色}} eyes, wearing {{服裝}}, {{情緒}} expression, {{拍攝角度}} shot, {{光線}} lighting, {{背景}}, photorealistic, 8K, shot on Sony A7R IV, {{風格關鍵詞}} --ar {{比例}} --s {{風格化}} --v 6.1",
+      "tags": ["人像", "寫實", "Midjourney"], "targetTools": ["Midjourney"],
+      "variables": [
+        { "name": "主要描述", "placeholder": "例：portrait of a" },
+        { "name": "種族",    "placeholder": "例：East Asian " },
+        { "name": "年齡",    "placeholder": "例：25" },
+        { "name": "髮型",    "placeholder": "例：short black" },
+        { "name": "眼睛顏色", "placeholder": "例：dark brown" },
+        { "name": "服裝",    "placeholder": "例：dark purple trench coat" },
+        { "name": "情緒",    "placeholder": "例：determined" },
+        { "name": "拍攝角度", "placeholder": "例：three-quarter" },
+        { "name": "光線",    "placeholder": "例：cinematic rim" },
+        { "name": "背景",    "placeholder": "例：neon-lit city alley" },
+        { "name": "風格關鍵詞","placeholder": "例：cyberpunk aesthetic, moody" },
+        { "name": "比例",    "placeholder": "例：2:3" },
+        { "name": "風格化",  "placeholder": "例：750" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ip-002", "name": "Midjourney 電影場景", "stage": "image-prompt", "category": "ip_mj",
+      "content": "cinematic establishing shot, {{場景描述}}, {{時間}}，{{天氣}}，{{色調}} color grading, {{鏡頭焦距}}mm lens, depth of field, epic scale, ultra detailed environment, {{藝術參考}} influence, award-winning cinematography, 8K --ar 16:9 --s {{風格化}} --v 6.1",
+      "tags": ["場景", "電影感", "Midjourney"], "targetTools": ["Midjourney"],
+      "variables": [
+        { "name": "場景描述", "placeholder": "例：futuristic underwater city with glowing domes" },
+        { "name": "時間",    "placeholder": "例：golden hour" },
+        { "name": "天氣",    "placeholder": "例：heavy rain and fog" },
+        { "name": "色調",    "placeholder": "例：teal and orange" },
+        { "name": "鏡頭焦距", "placeholder": "例：24" },
+        { "name": "藝術參考", "placeholder": "例：Roger Deakins" },
+        { "name": "風格化",  "placeholder": "例：800" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ip-003", "name": "Flux 模型指令", "stage": "image-prompt", "category": "ip_flux",
+      "content": "FLUX.1 [dev] prompt:\n\n{{主要場景}}. {{主體描述}}. Lighting: {{光線}}. Color palette: {{色彩}}. Camera: {{相機設定}}. Art style: {{藝術風格}}. Technical: high resolution, sharp focus, perfect anatomy, {{額外參數}}.\n\nNegative: blur, noise, distorted, watermark, low quality, ugly, extra limbs",
+      "tags": ["Flux", "文字轉圖", "詳細指令"], "targetTools": ["Flux"],
+      "variables": [
+        { "name": "主要場景", "placeholder": "例：A lone figure stands at the edge of..." },
+        { "name": "主體描述", "placeholder": "例：Young woman in futuristic armor..." },
+        { "name": "光線",    "placeholder": "例：dramatic backlight with lens flare" },
+        { "name": "色彩",    "placeholder": "例：desaturated with cyan accent" },
+        { "name": "相機設定", "placeholder": "例：wide angle, low perspective" },
+        { "name": "藝術風格", "placeholder": "例：hyperrealistic digital concept art" },
+        { "name": "額外參數", "placeholder": "例：cinematic composition, award-winning" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ip-004", "name": "GPT-4o DALL-E 指令", "stage": "image-prompt", "category": "ip_dalle",
+      "content": "Create a {{圖像類型}} image of {{主要描述}}.\n\nStyle: {{藝術風格}}\nMood: {{氛圍}}\nLighting: {{光線}}\nColor: {{色調}}\nComposition: {{構圖}}\n\nAdditional details: {{細節描述}}\nDimensions: {{尺寸}}\n\nPlease ensure high quality, detailed rendering, and artistic composition.",
+      "tags": ["DALL-E", "GPT-4o", "詳細描述"], "targetTools": ["ChatGPT"],
+      "variables": [
+        { "name": "圖像類型",  "placeholder": "例：photorealistic" },
+        { "name": "主要描述",  "placeholder": "例：a cyberpunk marketplace at night" },
+        { "name": "藝術風格",  "placeholder": "例：cinematic photography, Denis Villeneuve-inspired" },
+        { "name": "氛圍",     "placeholder": "例：mysterious and tense" },
+        { "name": "光線",     "placeholder": "例：neon reflections on wet pavement" },
+        { "name": "色調",     "placeholder": "例：cool blues with warm amber accents" },
+        { "name": "構圖",     "placeholder": "例：rule of thirds, leading lines toward center" },
+        { "name": "細節描述",  "placeholder": "例：crowded with vendors, holographic displays" },
+        { "name": "尺寸",     "placeholder": "例：1792x1024 (widescreen)" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ip-005", "name": "Grok Aurora 圖像", "stage": "image-prompt", "category": "ip_grok",
+      "content": "{{場景或主體}}. Style: {{風格}}. Mood: {{氛圍}}. Lighting: {{光線}}. Colors: {{色彩}}. {{額外細節}}. Ultra high quality, photorealistic details, cinematic composition.",
+      "tags": ["Grok", "Aurora", "簡潔指令"], "targetTools": ["Grok"],
+      "variables": [
+        { "name": "場景或主體", "placeholder": "例：A warrior woman standing in ruins" },
+        { "name": "風格",     "placeholder": "例：hyperrealistic digital art" },
+        { "name": "氛圍",     "placeholder": "例：epic, post-apocalyptic" },
+        { "name": "光線",     "placeholder": "例：harsh directional sunlight" },
+        { "name": "色彩",     "placeholder": "例：dusty amber and ash grey" },
+        { "name": "額外細節",  "placeholder": "例：wearing torn mechanical armor, holding broken sword" }
+      ], "usageCount": 0
+    },
+    {
+      "id": "ip-006", "name": "概念藝術風格包", "stage": "image-prompt", "category": "ip_mj",
+      "content": "{{主體}}，{{故事描述}}，concept art，{{藝術家風格}} style，{{色彩方案}} color scheme，highly detailed，dramatic composition，{{環境細節}}，professional illustration，artstation quality，{{額外標籤}} --ar {{比例}} --v 6.1",
+      "tags": ["概念藝術", "ArtStation", "插畫"], "targetTools": ["Midjourney"],
+      "variables": [
+        { "name": "主體",    "placeholder": "例：ancient war machine awakening" },
+        { "name": "故事描述", "placeholder": "例：buried for centuries suddenly activated" },
+        { "name": "藝術家風格","placeholder": "例：Craig Mullins, Feng Zhu" },
+        { "name": "色彩方案", "placeholder": "例：rust orange and dark iron grey" },
+        { "name": "環境細節", "placeholder": "例：surrounded by crumbling stone ruins" },
+        { "name": "額外標籤", "placeholder": "例：matte painting, environment design" },
+        { "name": "比例",    "placeholder": "例：16:9" }
+      ], "usageCount": 0
+    }
+  ]
+}
