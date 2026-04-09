@@ -85,6 +85,7 @@ export class WorkflowUI {
 
   // API
   private apiConfig: ApiConfig | null = null;
+  private apiGeneratedContent: string | null = null;
 
   // View
   private currentView: "templates" | "detail" | "history" | "settings" = "templates";
@@ -1009,6 +1010,9 @@ export class WorkflowUI {
     try {
       const response = await this.callApi(prompt);
 
+      // Store so Copy / Send use API content
+      this.apiGeneratedContent = response;
+
       // Fill response into preview
       preview.innerHTML = this.esc(response).replace(/\n/g, "<br>");
 
@@ -1210,6 +1214,7 @@ export class WorkflowUI {
   private openTemplate(tpl: WorkflowTemplate): void {
     this.selectedTemplate = tpl;
     this.varValues = {};
+    this.apiGeneratedContent = null;
     this.currentView = "detail";
     this.render();
   }
@@ -1242,6 +1247,8 @@ export class WorkflowUI {
 
   private getFilledContent(): string {
     if (!this.selectedTemplate) return "";
+    // If API has already generated content, use it directly
+    if (this.apiGeneratedContent) return this.apiGeneratedContent;
     let text = fillTemplate(this.selectedTemplate.content, this.varValues);
 
     // Feature #6: append English translation note when bilingual
