@@ -195,13 +195,14 @@ export interface ApiHistoryEntry {
 export const DEFAULT_API_CONFIG: ApiConfig = {
   key: "",
   endpoint: "https://generativelanguage.googleapis.com/v1beta/openai",
-  model: "gemma-3-27b-it",
+  model: "gemma-4-31b-it",
   enabled: false,
 };
 
 export const PRESET_MODELS = [
+  { label: "Gemma 4 31B (Google AI Studio)", value: "gemma-4-31b-it" },
+  { label: "Gemma 4 26B A4B (Google AI Studio)", value: "gemma-4-26b-a4b-it" },
   { label: "Gemma 3 27B (Google AI Studio)", value: "gemma-3-27b-it" },
-  { label: "Gemma 2 27B (Google AI Studio)", value: "gemma-2-27b-it" },
   { label: "GPT-4o mini (OpenAI)", value: "gpt-4o-mini" },
   { label: "GPT-4o (OpenAI)", value: "gpt-4o" },
   { label: "自訂（手動輸入）", value: "__custom__" },
