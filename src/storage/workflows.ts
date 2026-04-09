@@ -18,7 +18,6 @@ import {
   ApiConfig,
   ApiHistoryEntry,
   DEFAULT_API_CONFIG,
-  ApiProvider,
 } from "../models/workflow";
 
 // ── Storage Keys ─────────────────────────────────────────────────────────────

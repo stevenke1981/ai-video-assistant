@@ -17,6 +17,7 @@ import {
   ApiConfig,
   ApiHistoryEntry,
   ApiProvider,
+  ProviderSettings,
   PRESET_MODELS,
   PROVIDER_DEFAULTS,
 } from "../models/workflow";
@@ -582,7 +583,7 @@ export class WorkflowUI {
     btnRow.append(copyBtn, sendBtn);
 
     // API Generate button — only shown when API is configured
-    if (this.apiConfig?.enabled && this.apiConfig.key) {
+    if (this.apiConfig?.enabled && this.apiConfig[this.apiConfig.activeProvider]?.key) {
       const apiBtn = document.createElement("button");
       apiBtn.className = "aiv-btn aiv-btn-api";
       apiBtn.style.marginTop = "6px";
@@ -740,45 +741,33 @@ export class WorkflowUI {
     header.append(back, title);
     els.push(header);
 
-    const cfg = this.apiConfig ?? { ...{ provider: "gemini" as ApiProvider, key: "", endpoint: "https://generativelanguage.googleapis.com/v1beta", model: "gemma-4-31b-it", enabled: false, thinkingEnabled: false } };
+    const cfg: ApiConfig = this.apiConfig ?? { ...DEFAULT_API_CONFIG };
 
-    // ── API Config form ──
+    // ── Global toggles ──
     const section = document.createElement("div");
     section.className = "aiv-settings-section";
 
-    // Enable toggle
-    const enableRow = document.createElement("div");
-    enableRow.className = "aiv-settings-row";
-    enableRow.innerHTML = `<span class="aiv-settings-label">啟用 API 協助</span>`;
-    const toggleWrap = document.createElement("label");
-    toggleWrap.className = "aiv-toggle";
-    const toggleInput = document.createElement("input");
-    toggleInput.type = "checkbox";
-    toggleInput.checked = cfg.enabled;
-    const track = document.createElement("div");
-    track.className = "aiv-toggle-track";
-    const thumb = document.createElement("div");
-    thumb.className = "aiv-toggle-thumb";
-    toggleWrap.append(toggleInput, track, thumb);
-    enableRow.appendChild(toggleWrap);
-    section.appendChild(enableRow);
+    const makeToggleRow = (label: string, checked: boolean): [HTMLElement, HTMLInputElement] => {
+      const row = document.createElement("div");
+      row.className = "aiv-settings-row";
+      row.innerHTML = `<span class="aiv-settings-label">${label}</span>`;
+      const wrap = document.createElement("label");
+      wrap.className = "aiv-toggle";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = checked;
+      const t = document.createElement("div");
+      t.className = "aiv-toggle-track";
+      const th = document.createElement("div");
+      th.className = "aiv-toggle-thumb";
+      wrap.append(input, t, th);
+      row.appendChild(wrap);
+      return [row, input];
+    };
 
-    // Think mode toggle (Gemini only)
-    const thinkRow = document.createElement("div");
-    thinkRow.className = "aiv-settings-row";
-    thinkRow.innerHTML = `<span class="aiv-settings-label">🧠 Think 模式<span class="aiv-settings-hint-inline">（Gemma 4 深度推理）</span></span>`;
-    const thinkWrap = document.createElement("label");
-    thinkWrap.className = "aiv-toggle";
-    const thinkInput = document.createElement("input");
-    thinkInput.type = "checkbox";
-    thinkInput.checked = cfg.thinkingEnabled;
-    const thinkTrack = document.createElement("div");
-    thinkTrack.className = "aiv-toggle-track";
-    const thinkThumb = document.createElement("div");
-    thinkThumb.className = "aiv-toggle-thumb";
-    thinkWrap.append(thinkInput, thinkTrack, thinkThumb);
-    thinkRow.appendChild(thinkWrap);
-    section.appendChild(thinkRow);
+    const [enableRow, toggleInput] = makeToggleRow("啟用 API 協助", cfg.enabled);
+    const [thinkRow, thinkInput]   = makeToggleRow("🧠 Think 模式<span class=\"aiv-settings-hint-inline\">（Gemma 4 深度推理）</span>", cfg.thinkingEnabled);
+    section.append(enableRow, thinkRow);
 
     // ── Provider selector ──
     const providerGroup = document.createElement("div");
@@ -791,21 +780,16 @@ export class WorkflowUI {
       { label: "🟠 OpenRouter", value: "openrouter" },
     ].forEach(({ label, value }) => {
       const opt = document.createElement("option");
-      opt.value = value;
-      opt.textContent = label;
+      opt.value = value; opt.textContent = label;
       providerSelect.appendChild(opt);
     });
-    providerSelect.value = cfg.provider ?? "gemini";
+    providerSelect.value = cfg.activeProvider;
     providerGroup.appendChild(providerSelect);
     section.appendChild(providerGroup);
 
-    // Think mode only applies to Gemini
-    thinkRow.style.display = cfg.provider === "openrouter" ? "none" : "flex";
-    providerSelect.addEventListener("change", () => {
-      thinkRow.style.display = providerSelect.value === "openrouter" ? "none" : "flex";
-    });
+    thinkRow.style.display = cfg.activeProvider === "openrouter" ? "none" : "flex";
 
-    // API Key
+    // ── Per-provider fields ──
     const keyGroup = document.createElement("div");
     keyGroup.className = "aiv-var-group";
     keyGroup.innerHTML = `<label class="aiv-var-label">API 金鑰</label>`;
@@ -815,134 +799,147 @@ export class WorkflowUI {
     keyInput.className = "aiv-var-input";
     keyInput.type = "password";
     keyInput.placeholder = "AIzaSy... (Gemini) 或 sk-or-... (OpenRouter)";
-    keyInput.value = cfg.key;
+    keyInput.value = cfg[cfg.activeProvider].key;
     const eyeBtn = document.createElement("button");
     eyeBtn.className = "aiv-settings-eye";
     eyeBtn.type = "button";
     eyeBtn.textContent = "👁";
-    eyeBtn.title = "顯示/隱藏";
-    eyeBtn.addEventListener("click", () => {
-      keyInput.type = keyInput.type === "password" ? "text" : "password";
-    });
+    eyeBtn.addEventListener("click", () => { keyInput.type = keyInput.type === "password" ? "text" : "password"; });
     keyWrap.append(keyInput, eyeBtn);
     keyGroup.appendChild(keyWrap);
     section.appendChild(keyGroup);
 
-    // Model selector + custom input
     const modelGroup = document.createElement("div");
     modelGroup.className = "aiv-var-group";
     modelGroup.innerHTML = `<label class="aiv-var-label">模型</label>`;
-
     const modelSelect = document.createElement("select");
     modelSelect.className = "aiv-style-select";
-
     const customInput = document.createElement("input");
     customInput.className = "aiv-var-input";
     customInput.style.marginTop = "4px";
     customInput.placeholder = "輸入自訂模型名稱";
-
-    const rebuildModelOptions = (provider: ApiProvider) => {
-      modelSelect.innerHTML = "";
-      const presets = PRESET_MODELS[provider];
-      const isCustom = !presets.some((m) => m.value === cfg.model && m.value !== "__custom__");
-      presets.forEach((m) => {
-        const opt = document.createElement("option");
-        opt.value = m.value;
-        opt.textContent = m.label;
-        modelSelect.appendChild(opt);
-      });
-      // When switching providers, default to that provider's default model
-      const defaultModel = PROVIDER_DEFAULTS[provider].model;
-      const currentIsValid = presets.some((m) => m.value === cfg.model);
-      modelSelect.value = currentIsValid ? (isCustom ? "__custom__" : cfg.model) : defaultModel;
-      customInput.value = modelSelect.value === "__custom__" ? cfg.model : modelSelect.value;
-      customInput.style.display = modelSelect.value === "__custom__" ? "block" : "none";
-    };
-
-    rebuildModelOptions(cfg.provider ?? "gemini");
-
-    providerSelect.addEventListener("change", () => {
-      const p = providerSelect.value as ApiProvider;
-      epInput.value = PROVIDER_DEFAULTS[p].endpoint;
-      rebuildModelOptions(p);
-    });
-
-    modelSelect.addEventListener("change", () => {
-      customInput.style.display = modelSelect.value === "__custom__" ? "block" : "none";
-      if (modelSelect.value !== "__custom__") customInput.value = modelSelect.value;
-    });
-
     modelGroup.append(modelSelect, customInput);
     section.appendChild(modelGroup);
 
-    // Endpoint
     const epGroup = document.createElement("div");
     epGroup.className = "aiv-var-group";
     epGroup.innerHTML = `<label class="aiv-var-label">API Endpoint</label>`;
     const epInput = document.createElement("input");
     epInput.className = "aiv-var-input";
     epInput.type = "text";
-    epInput.value = cfg.endpoint;
     epGroup.appendChild(epInput);
     section.appendChild(epGroup);
+
+    // Populate fields for a given provider
+    const loadProvider = (p: ApiProvider) => {
+      const ps = cfg[p];
+      keyInput.value = ps.key;
+      epInput.value = ps.endpoint;
+      thinkRow.style.display = p === "openrouter" ? "none" : "flex";
+
+      modelSelect.innerHTML = "";
+      const presets = PRESET_MODELS[p];
+      presets.forEach((m) => {
+        const opt = document.createElement("option");
+        opt.value = m.value; opt.textContent = m.label;
+        modelSelect.appendChild(opt);
+      });
+      const isCustom = !presets.some((m) => m.value === ps.model && m.value !== "__custom__");
+      modelSelect.value = isCustom ? "__custom__" : ps.model;
+      customInput.value = ps.model;
+      customInput.style.display = modelSelect.value === "__custom__" ? "block" : "none";
+    };
+
+    loadProvider(cfg.activeProvider);
+
+    providerSelect.addEventListener("change", () => loadProvider(providerSelect.value as ApiProvider));
+    modelSelect.addEventListener("change", () => {
+      customInput.style.display = modelSelect.value === "__custom__" ? "block" : "none";
+      if (modelSelect.value !== "__custom__") customInput.value = modelSelect.value;
+    });
 
     // Hint
     const hint = document.createElement("div");
     hint.className = "aiv-settings-hint";
-    hint.textContent = "設定變更後自動儲存。金鑰僅存於本機 chrome.storage.local。";
+    hint.textContent = "每個服務商的金鑰獨立儲存。金鑰僅存於本機 chrome.storage.local。";
     section.appendChild(hint);
 
-    // Test button
-    const testBtn = document.createElement("button");
-    testBtn.className = "aiv-btn aiv-btn-outline aiv-btn-test";
-    testBtn.textContent = "🔌 測試連線";
-    testBtn.addEventListener("click", async () => {
-      const provider = providerSelect.value as ApiProvider;
+    // ── Button row: Save + Test ──
+    const btnRow = document.createElement("div");
+    btnRow.className = "aiv-btn-row";
+    btnRow.style.marginTop = "2px";
+
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "aiv-btn aiv-btn-primary";
+    saveBtn.textContent = "💾 儲存設定";
+    saveBtn.addEventListener("click", () => {
+      const p = providerSelect.value as ApiProvider;
       const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
-      const testCfg: ApiConfig = {
-        provider,
+      const ps: ProviderSettings = {
         key: keyInput.value.trim(),
-        endpoint: epInput.value.trim() || PROVIDER_DEFAULTS[provider].endpoint,
-        model: model || PROVIDER_DEFAULTS[provider].model,
-        enabled: true,
-        thinkingEnabled: thinkInput.checked,
+        endpoint: epInput.value.trim() || PROVIDER_DEFAULTS[p].endpoint,
+        model: model || PROVIDER_DEFAULTS[p].model,
       };
-      if (!testCfg.key) { this.toast("請先輸入 API 金鑰", "error"); return; }
-      testBtn.disabled = true;
-      testBtn.textContent = "⏳ 測試中…";
-      try {
-        await this.testApiConnection(testCfg);
-        testBtn.textContent = "✅ 連線成功";
-        this.toast(`${testCfg.model} 連線正常 ✅`, "success");
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        testBtn.textContent = "❌ 連線失敗";
-        this.toast(`連線失敗：${msg}`, "error");
-      } finally {
-        setTimeout(() => { testBtn.textContent = "🔌 測試連線"; testBtn.disabled = false; }, 3000);
-      }
-    });
-    section.appendChild(testBtn);
-
-    els.push(section);
-
-    // Auto-save on any change
-    const autoSave = () => {
-      const provider = providerSelect.value as ApiProvider;
-      const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
       const next: ApiConfig = {
-        provider,
-        key: keyInput.value.trim(),
-        endpoint: epInput.value.trim() || PROVIDER_DEFAULTS[provider].endpoint,
-        model: model || PROVIDER_DEFAULTS[provider].model,
+        ...cfg,
+        activeProvider: p,
         enabled: toggleInput.checked,
         thinkingEnabled: thinkInput.checked,
+        [p]: ps,
       };
       this.apiConfig = next;
       saveApiConfig(next);
+      saveBtn.textContent = "✅ 已儲存";
+      setTimeout(() => { saveBtn.textContent = "💾 儲存設定"; }, 1800);
+      this.toast("設定已儲存", "success");
+    });
+
+    const testBtn = document.createElement("button");
+    testBtn.className = "aiv-btn aiv-btn-outline aiv-btn-test";
+    testBtn.style.flex = "0 0 auto";
+    testBtn.textContent = "🔌 測試";
+    testBtn.addEventListener("click", async () => {
+      const p = providerSelect.value as ApiProvider;
+      const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
+      const testCfg: ApiConfig = {
+        ...cfg,
+        activeProvider: p,
+        enabled: true,
+        thinkingEnabled: thinkInput.checked,
+        [p]: {
+          key: keyInput.value.trim(),
+          endpoint: epInput.value.trim() || PROVIDER_DEFAULTS[p].endpoint,
+          model: model || PROVIDER_DEFAULTS[p].model,
+        },
+      };
+      if (!testCfg[p].key) { this.toast("請先輸入 API 金鑰", "error"); return; }
+      testBtn.disabled = true;
+      testBtn.textContent = "⏳…";
+      try {
+        await this.testApiConnection(testCfg);
+        testBtn.textContent = "✅ 成功";
+        this.toast(`${testCfg[p].model} 連線正常 ✅`, "success");
+      } catch (e) {
+        testBtn.textContent = "❌ 失敗";
+        this.toast(`連線失敗：${e instanceof Error ? e.message : String(e)}`, "error");
+      } finally {
+        setTimeout(() => { testBtn.textContent = "🔌 測試"; testBtn.disabled = false; }, 3000);
+      }
+    });
+
+    btnRow.append(saveBtn, testBtn);
+    section.appendChild(btnRow);
+    els.push(section);
+
+    // Toggles auto-save immediately (no key exposure)
+    const autoSaveToggles = () => {
+      if (!this.apiConfig) return;
+      const next: ApiConfig = { ...this.apiConfig, enabled: toggleInput.checked, thinkingEnabled: thinkInput.checked };
+      this.apiConfig = next;
+      saveApiConfig(next);
     };
-    [keyInput, epInput, customInput].forEach((el) => el.addEventListener("input", autoSave));
-    [toggleInput, thinkInput, providerSelect, modelSelect].forEach((el) => el.addEventListener("change", autoSave));
+    toggleInput.addEventListener("change", autoSaveToggles);
+    thinkInput.addEventListener("change", autoSaveToggles);
 
     // ── API History ──
     const histHeader = document.createElement("div");
@@ -1056,8 +1053,8 @@ export class WorkflowUI {
         id: crypto.randomUUID(),
         prompt,
         response,
-        model: this.apiConfig?.model ?? "",
-        provider: this.apiConfig?.provider ?? "gemini",
+        model: this.apiConfig?.[this.apiConfig.activeProvider]?.model ?? "",
+        provider: this.apiConfig?.activeProvider ?? "gemini",
         stage: this.activeTab,
         sentAt: Date.now(),
       };
@@ -1086,28 +1083,24 @@ export class WorkflowUI {
 
   private async callApi(prompt: string): Promise<string> {
     const cfg = this.apiConfig;
-    if (!cfg || !cfg.key) throw new Error("尚未設定 API 金鑰");
+    if (!cfg) throw new Error("尚未設定 API");
+    const p = cfg.activeProvider;
+    const ps = cfg[p];
+    if (!ps.key) throw new Error("尚未設定 API 金鑰");
     const userPrompt = `以下是已填寫完成的資料與輸出要求，請立即依格式生成所有指定內容：\n\n${prompt}`;
-    return cfg.provider === "openrouter"
-      ? this.callOpenRouter(cfg, userPrompt)
-      : this.callGemini(cfg, userPrompt);
+    return p === "openrouter"
+      ? this.callOpenRouter(ps, userPrompt)
+      : this.callGemini(ps, cfg.thinkingEnabled, userPrompt);
   }
 
-  private async callGemini(cfg: ApiConfig, prompt: string): Promise<string> {
-    const base = cfg.endpoint.replace(/\/$/, "");
-    const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
+  private async callGemini(ps: ProviderSettings, thinking: boolean, prompt: string): Promise<string> {
+    const url = `${ps.endpoint.replace(/\/$/, "")}/models/${ps.model}:generateContent?key=${encodeURIComponent(ps.key)}`;
     const body: Record<string, unknown> = {
       system_instruction: { parts: [{ text: this.SYSTEM_PROMPT }] },
       contents: [{ parts: [{ text: prompt }] }],
     };
-    if (cfg.thinkingEnabled) {
-      body.generationConfig = { thinkingConfig: { thinkingBudget: 8192 } };
-    }
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    if (thinking) body.generationConfig = { thinkingConfig: { thinkingBudget: 8192 } };
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).substring(0, 200)}`);
     const data = await res.json() as { candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[] };
     const parts = data?.candidates?.[0]?.content?.parts ?? [];
@@ -1116,23 +1109,12 @@ export class WorkflowUI {
     return text;
   }
 
-  private async callOpenRouter(cfg: ApiConfig, prompt: string): Promise<string> {
-    const url = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
+  private async callOpenRouter(ps: ProviderSettings, prompt: string): Promise<string> {
+    const url = ps.endpoint.replace(/\/$/, "") + "/chat/completions";
     const res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${cfg.key}`,
-        "HTTP-Referer": "https://github.com/stevenke1981/ai-video-assistant",
-        "X-Title": "AI Video Assistant",
-      },
-      body: JSON.stringify({
-        model: cfg.model,
-        messages: [
-          { role: "system", content: this.SYSTEM_PROMPT },
-          { role: "user", content: prompt },
-        ],
-      }),
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${ps.key}`, "HTTP-Referer": "https://github.com/stevenke1981/ai-video-assistant", "X-Title": "AI Video Assistant" },
+      body: JSON.stringify({ model: ps.model, messages: [{ role: "system", content: this.SYSTEM_PROMPT }, { role: "user", content: prompt }] }),
     });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).substring(0, 200)}`);
     const data = await res.json() as { choices?: { message?: { content?: string } }[] };
@@ -1142,27 +1124,19 @@ export class WorkflowUI {
   }
 
   private async testApiConnection(cfg: ApiConfig): Promise<void> {
-    if (cfg.provider === "openrouter") {
-      const url = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
+    const p = cfg.activeProvider;
+    const ps = cfg[p];
+    if (p === "openrouter") {
+      const url = ps.endpoint.replace(/\/$/, "") + "/chat/completions";
       const res = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${cfg.key}`,
-          "HTTP-Referer": "https://github.com/stevenke1981/ai-video-assistant",
-          "X-Title": "AI Video Assistant",
-        },
-        body: JSON.stringify({ model: cfg.model, messages: [{ role: "user", content: "Hi" }], max_tokens: 5 }),
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${ps.key}`, "HTTP-Referer": "https://github.com/stevenke1981/ai-video-assistant", "X-Title": "AI Video Assistant" },
+        body: JSON.stringify({ model: ps.model, messages: [{ role: "user", content: "Hi" }], max_tokens: 5 }),
       });
       if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).substring(0, 150)}`);
     } else {
-      const base = cfg.endpoint.replace(/\/$/, "");
-      const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: "Hi" }] }] }),
-      });
+      const url = `${ps.endpoint.replace(/\/$/, "")}/models/${ps.model}:generateContent?key=${encodeURIComponent(ps.key)}`;
+      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: "Hi" }] }] }) });
       if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).substring(0, 150)}`);
     }
   }

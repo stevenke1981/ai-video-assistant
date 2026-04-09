@@ -177,13 +177,18 @@ export interface TemplateFile {
 
 export type ApiProvider = "gemini" | "openrouter";
 
-export interface ApiConfig {
-  provider: ApiProvider;
+export interface ProviderSettings {
   key: string;
   endpoint: string;
   model: string;
+}
+
+export interface ApiConfig {
+  activeProvider: ApiProvider;
   enabled: boolean;
   thinkingEnabled: boolean;
+  gemini: ProviderSettings;
+  openrouter: ProviderSettings;
 }
 
 export interface ApiHistoryEntry {
@@ -196,18 +201,17 @@ export interface ApiHistoryEntry {
   sentAt: number;
 }
 
-export const DEFAULT_API_CONFIG: ApiConfig = {
-  provider: "gemini",
-  key: "",
-  endpoint: "https://generativelanguage.googleapis.com/v1beta",
-  model: "gemma-4-31b-it",
-  enabled: false,
-  thinkingEnabled: false,
+export const PROVIDER_DEFAULTS: Record<ApiProvider, ProviderSettings> = {
+  gemini:     { key: "", endpoint: "https://generativelanguage.googleapis.com/v1beta", model: "gemma-4-31b-it" },
+  openrouter: { key: "", endpoint: "https://openrouter.ai/api/v1",                    model: "arcee-ai/trinity-large-preview:free" },
 };
 
-export const PROVIDER_DEFAULTS: Record<ApiProvider, { endpoint: string; model: string }> = {
-  gemini:     { endpoint: "https://generativelanguage.googleapis.com/v1beta", model: "gemma-4-31b-it" },
-  openrouter: { endpoint: "https://openrouter.ai/api/v1",                    model: "arcee-ai/trinity-large-preview:free" },
+export const DEFAULT_API_CONFIG: ApiConfig = {
+  activeProvider: "gemini",
+  enabled: false,
+  thinkingEnabled: false,
+  gemini:     { ...PROVIDER_DEFAULTS.gemini },
+  openrouter: { ...PROVIDER_DEFAULTS.openrouter },
 };
 
 export const PRESET_MODELS: Record<ApiProvider, { label: string; value: string }[]> = {
