@@ -312,7 +312,30 @@ export async function saveVarCache(cache: Record<string, string>): Promise<void>
 // ── API Config ────────────────────────────────────────────────────────────────
 
 export async function getApiConfig(): Promise<ApiConfig> {
-  return (await get<ApiConfig>(KEYS.API_CONFIG)) ?? { ...DEFAULT_API_CONFIG };
+  const raw = await get<Record<string, unknown>>(KEYS.API_CONFIG);
+  if (!raw) return { ...DEFAULT_API_CONFIG, gemini: { ...DEFAULT_API_CONFIG.gemini }, openrouter: { ...DEFAULT_API_CONFIG.openrouter } };
+
+  // Migrate old flat format { provider, key, endpoint, model } → new nested format
+  if (raw["gemini"] === undefined || raw["openrouter"] === undefined) {
+    const oldProvider = (raw["provider"] as string) === "openrouter" ? "openrouter" : "gemini";
+    const migrated: ApiConfig = {
+      ...DEFAULT_API_CONFIG,
+      gemini: { ...DEFAULT_API_CONFIG.gemini },
+      openrouter: { ...DEFAULT_API_CONFIG.openrouter },
+      activeProvider: oldProvider,
+      enabled: (raw["enabled"] as boolean) ?? false,
+      thinkingEnabled: (raw["thinkingEnabled"] as boolean) ?? false,
+    };
+    migrated[oldProvider] = {
+      key: (raw["key"] as string) ?? "",
+      endpoint: (raw["endpoint"] as string) || DEFAULT_API_CONFIG[oldProvider].endpoint,
+      model: (raw["model"] as string) || DEFAULT_API_CONFIG[oldProvider].model,
+    };
+    await set(KEYS.API_CONFIG, migrated);
+    return migrated;
+  }
+
+  return raw as unknown as ApiConfig;
 }
 
 export async function saveApiConfig(config: ApiConfig): Promise<void> {
