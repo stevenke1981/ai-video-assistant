@@ -177,10 +177,10 @@ export interface TemplateFile {
 
 export interface ApiConfig {
   key: string;
-  /** OpenAI-compatible base URL, e.g. https://generativelanguage.googleapis.com/v1beta/openai */
   endpoint: string;
   model: string;
   enabled: boolean;
+  thinkingEnabled: boolean;
 }
 
 export interface ApiHistoryEntry {
@@ -197,6 +197,7 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
   endpoint: "https://generativelanguage.googleapis.com/v1beta",
   model: "gemma-4-31b-it",
   enabled: false,
+  thinkingEnabled: false,
 };
 
 export const PRESET_MODELS = [

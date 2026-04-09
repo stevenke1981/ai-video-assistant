@@ -760,6 +760,23 @@ export class WorkflowUI {
     enableRow.appendChild(toggleWrap);
     section.appendChild(enableRow);
 
+    // Think mode toggle
+    const thinkRow = document.createElement("div");
+    thinkRow.className = "aiv-settings-row";
+    thinkRow.innerHTML = `<span class="aiv-settings-label">🧠 Think 模式<span class="aiv-settings-hint-inline">（Gemma 4 深度推理）</span></span>`;
+    const thinkWrap = document.createElement("label");
+    thinkWrap.className = "aiv-toggle";
+    const thinkInput = document.createElement("input");
+    thinkInput.type = "checkbox";
+    thinkInput.checked = cfg.thinkingEnabled;
+    const thinkTrack = document.createElement("div");
+    thinkTrack.className = "aiv-toggle-track";
+    const thinkThumb = document.createElement("div");
+    thinkThumb.className = "aiv-toggle-thumb";
+    thinkWrap.append(thinkInput, thinkTrack, thinkThumb);
+    thinkRow.appendChild(thinkWrap);
+    section.appendChild(thinkRow);
+
     // API Key
     const keyGroup = document.createElement("div");
     keyGroup.className = "aiv-var-group";
@@ -840,9 +857,10 @@ export class WorkflowUI {
       const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
       const cfg: ApiConfig = {
         key: keyInput.value.trim(),
-        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta/openai",
+        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta",
         model: model || "gemma-4-31b-it",
         enabled: true,
+        thinkingEnabled: thinkInput.checked,
       };
       if (!cfg.key) { this.toast("請先輸入 API 金鑰", "error"); return; }
       testBtn.disabled = true;
@@ -881,12 +899,13 @@ export class WorkflowUI {
         endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta",
         model: model || "gemma-4-31b-it",
         enabled: toggleInput.checked,
+        thinkingEnabled: thinkInput.checked,
       };
       this.apiConfig = next;
       saveApiConfig(next);
     };
     [keyInput, epInput, customInput].forEach((el) => el.addEventListener("input", autoSave));
-    toggleInput.addEventListener("change", autoSave);
+    [toggleInput, thinkInput].forEach((el) => el.addEventListener("change", autoSave));
     modelSelect.addEventListener("change", autoSave);
 
     // ── API History ──
@@ -1022,12 +1041,25 @@ export class WorkflowUI {
     const base = cfg.endpoint.replace(/\/$/, "");
     const url = `${base}/models/${cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
 
+    const body: Record<string, unknown> = {
+      system_instruction: {
+        parts: [{
+          text: "你是一個專業的影片製作提示詞生成助手。使用者會提供一個模板結構，你必須嚴格依照模板的格式與段落完整輸出，不得省略任何指定項目、不得更改結構順序。若模板要求多個角度或多個段落，必須逐一完整輸出每個段落。輸出語言與模板保持一致。",
+        }],
+      },
+      contents: [{ parts: [{ text: prompt }] }],
+    };
+
+    if (cfg.thinkingEnabled) {
+      body.generationConfig = {
+        thinkingConfig: { thinkingBudget: 8192 },
+      };
+    }
+
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
@@ -1036,9 +1068,11 @@ export class WorkflowUI {
     }
 
     const data = await res.json() as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
+      candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[];
     };
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Filter out thought parts, only return actual response text
+    const parts = data?.candidates?.[0]?.content?.parts ?? [];
+    const text = parts.filter((p) => !p.thought).map((p) => p.text ?? "").join("").trim();
     if (!text) throw new Error("API 回應格式異常");
     return text;
   }

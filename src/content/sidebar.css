@@ -860,6 +860,13 @@
   padding-top: 8px;
 }
 
+.aiv-settings-hint-inline {
+  font-size: 10px;
+  color: var(--aiv-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
 /* ── Resize Handle ───────────────────────────────────── */
 .aiv-resize-handle {
   position: absolute;
