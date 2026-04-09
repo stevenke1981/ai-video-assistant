@@ -21,6 +21,7 @@ import {
   PRESET_MODELS,
   PROVIDER_DEFAULTS,
 } from "../models/workflow";
+import { WizardUI } from "./wizard-ui";
 import {
   getTemplates,
   getTabGroups,
@@ -91,7 +92,8 @@ export class WorkflowUI {
   private apiGeneratedContent: string | null = null;
 
   // View
-  private currentView: "templates" | "detail" | "history" | "settings" = "templates";
+  private currentView: "templates" | "detail" | "history" | "settings" | "wizard" = "templates";
+  private wizardUI: WizardUI | null = null;
 
   constructor(root: HTMLElement, callbacks: UICallbacks, platform: string) {
     this.root = root;
@@ -143,6 +145,7 @@ export class WorkflowUI {
       case "detail":    body.append(...this.buildDetailView());    break;
       case "history":   body.append(...this.buildHistoryView());   break;
       case "settings":  body.append(...this.buildSettingsView());  break;
+      case "wizard":    this.mountWizardView(body);                break;
     }
 
     this.root.appendChild(body);
@@ -161,6 +164,7 @@ export class WorkflowUI {
       </div>
       <span class="aiv-platform-badge">${this.platform}</span>
       <div class="aiv-header-actions">
+        <button class="aiv-icon-btn" id="aiv-btn-wizard" title="AI精靈模式">🪄</button>
         <button class="aiv-icon-btn" id="aiv-btn-history" title="提示詞歷史">📋</button>
         <button class="aiv-icon-btn" id="aiv-btn-settings" title="設定">⚙️</button>
         <button class="aiv-icon-btn" id="aiv-btn-close" title="關閉">✕</button>
@@ -173,6 +177,10 @@ export class WorkflowUI {
     });
     el.querySelector("#aiv-btn-settings")?.addEventListener("click", () => {
       this.currentView = "settings";
+      this.render();
+    });
+    el.querySelector("#aiv-btn-wizard")?.addEventListener("click", () => {
+      this.currentView = "wizard";
       this.render();
     });
 
@@ -1139,6 +1147,20 @@ export class WorkflowUI {
       const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: "Hi" }] }] }) });
       if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).substring(0, 150)}`);
     }
+  }
+
+  private mountWizardView(container: HTMLElement): void {
+    if (!this.apiConfig) return;
+    this.wizardUI = new WizardUI(container, this.apiConfig, {
+      onBack: () => {
+        this.currentView = "templates";
+        this.wizardUI = null;
+        this.render();
+      },
+      onSendToAI: (text) => this.callbacks.onSendToAI(text),
+      onToast: (msg, type) => this.toast(msg, type),
+    });
+    this.wizardUI.render();
   }
 
   private buildHistoryView(): HTMLElement[] {

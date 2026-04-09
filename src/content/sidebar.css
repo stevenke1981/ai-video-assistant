@@ -893,3 +893,247 @@
 }
 
 .aiv-resize-handle:hover::after { opacity: .7; }
+
+/* ── AI精靈模式 (Wizard Mode) ───────────────────────── */
+
+/* Intro card */
+.aiv-wizard-intro {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: linear-gradient(135deg, var(--aiv-brand-light) 0%, #f0fdf4 100%);
+  border: 1px solid var(--aiv-brand-muted);
+  border-radius: var(--aiv-radius-sm);
+  padding: 10px 12px;
+  margin: 6px 0;
+}
+
+.aiv-wizard-intro-icon { font-size: 24px; flex-shrink: 0; }
+
+.aiv-wizard-intro-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--aiv-brand-dark);
+}
+
+/* Start button */
+.aiv-btn-wizard-start {
+  width: 100%;
+  background: linear-gradient(135deg, var(--aiv-brand) 0%, var(--aiv-brand-dark) 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: var(--aiv-radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--aiv-transition);
+}
+.aiv-btn-wizard-start:hover { opacity: .88; }
+.aiv-btn-wizard-start:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Session list */
+.aiv-wizard-session-item {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.aiv-wizard-session-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--aiv-text);
+}
+
+.aiv-wizard-session-meta {
+  font-size: 10px;
+  color: var(--aiv-muted);
+}
+
+.aiv-wizard-session-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* Progress bar (in session list) */
+.aiv-wizard-progress-bar {
+  height: 4px;
+  background: var(--aiv-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.aiv-wizard-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--aiv-brand) 0%, var(--aiv-accent) 100%);
+  border-radius: 2px;
+  transition: width .4s ease;
+}
+
+/* Stage progress indicator */
+.aiv-wizard-progress-wrap {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--aiv-bg2);
+  border-bottom: 1px solid var(--aiv-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 0;
+}
+.aiv-wizard-progress-wrap::-webkit-scrollbar { display: none; }
+
+.aiv-wizard-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 44px;
+  cursor: default;
+  opacity: .45;
+  transition: opacity var(--aiv-transition);
+}
+
+.aiv-wizard-step.done   { opacity: .7; cursor: pointer; }
+.aiv-wizard-step.current { opacity: 1; cursor: default; }
+
+.aiv-wizard-step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--aiv-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: background var(--aiv-transition);
+}
+
+.aiv-wizard-step.done .aiv-wizard-step-dot {
+  background: var(--aiv-accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.aiv-wizard-step.current .aiv-wizard-step-dot {
+  background: var(--aiv-brand);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--aiv-brand-light);
+}
+
+.aiv-wizard-step-name {
+  font-size: 9px;
+  color: var(--aiv-muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.aiv-wizard-step.current .aiv-wizard-step-name { color: var(--aiv-brand); }
+
+.aiv-wizard-step-sep {
+  flex: 1;
+  height: 2px;
+  background: var(--aiv-border);
+  min-width: 8px;
+  align-self: flex-start;
+  margin-top: 13px;
+}
+.aiv-wizard-step-sep.done { background: var(--aiv-accent); }
+
+/* Stage desc */
+.aiv-wizard-stage-desc {
+  font-size: 12px;
+  color: var(--aiv-muted);
+  padding: 8px 12px 4px;
+  line-height: 1.5;
+}
+
+/* Collapsible prev stage */
+.aiv-wizard-collapsible {
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  margin: 0 0 6px 0;
+  overflow: hidden;
+}
+
+.aiv-wizard-collapsible-title {
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--aiv-brand);
+  background: var(--aiv-bg2);
+  user-select: none;
+  list-style: none;
+}
+.aiv-wizard-collapsible-title::-webkit-details-marker { display: none; }
+
+.aiv-wizard-collapsible-body {
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--aiv-muted);
+  white-space: pre-wrap;
+  line-height: 1.6;
+  max-height: 160px;
+  overflow-y: auto;
+  background: var(--aiv-bg3);
+}
+
+/* Content wrap */
+.aiv-wizard-content-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Setup form textarea */
+.aiv-wizard-textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+/* Result textarea */
+.aiv-wizard-result-textarea {
+  width: 100%;
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--aiv-text);
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 180px;
+  outline: none;
+  transition: border-color var(--aiv-transition);
+}
+.aiv-wizard-result-textarea:focus { border-color: var(--aiv-brand); }
+
+/* Generate wrap + spinner */
+.aiv-wizard-gen-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 12px;
+}
+
+@keyframes aiv-spin { to { transform: rotate(360deg); } }
+
+.aiv-wizard-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--aiv-border);
+  border-top-color: var(--aiv-brand);
+  border-radius: 50%;
+  animation: aiv-spin .8s linear infinite;
+}
