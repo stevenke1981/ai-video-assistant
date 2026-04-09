@@ -14,6 +14,9 @@ import {
   VIDEO_TOOLS,
   BUILT_IN_STYLE_PACKS,
   fillTemplate,
+  ApiConfig,
+  ApiHistoryEntry,
+  PRESET_MODELS,
 } from "../models/workflow";
 import {
   getTemplates,
@@ -33,6 +36,12 @@ import {
   saveVarCache,
   duplicateTemplate,
   deleteTemplate,
+  getApiConfig,
+  saveApiConfig,
+  getApiHistory,
+  addToApiHistory,
+  clearApiHistory,
+  exportApiHistoryJson,
 } from "../storage/workflows";
 
 export interface UICallbacks {
@@ -74,8 +83,11 @@ export class WorkflowUI {
   private settings: Settings | null = null;
   private varCache: Record<string, string> = {};
 
+  // API
+  private apiConfig: ApiConfig | null = null;
+
   // View
-  private currentView: "templates" | "detail" | "history" | "project" = "templates";
+  private currentView: "templates" | "detail" | "history" | "settings" = "templates";
 
   constructor(root: HTMLElement, callbacks: UICallbacks, platform: string) {
     this.root = root;
@@ -84,7 +96,7 @@ export class WorkflowUI {
   }
 
   async init(): Promise<void> {
-    const [templates, tabGroups, categories, settings, project, stylePresets, varCache] =
+    const [templates, tabGroups, categories, settings, project, stylePresets, varCache, apiConfig] =
       await Promise.all([
         getTemplates(),
         getTabGroups(),
@@ -93,11 +105,13 @@ export class WorkflowUI {
         getActiveProject(),
         getStylePresets(),
         getVarCache(),
+        getApiConfig(),
       ]);
 
     this.templates = templates;
     this.tabGroups = tabGroups;
     this.categories = categories;
+    this.apiConfig = apiConfig;
     this.settings = settings;
     this.stylePresets = [...BUILT_IN_STYLE_PACKS.flatMap((p) => p.presets), ...stylePresets];
     this.activeProject = project;
@@ -124,6 +138,7 @@ export class WorkflowUI {
       case "templates": body.append(...this.buildTemplateView()); break;
       case "detail":    body.append(...this.buildDetailView());    break;
       case "history":   body.append(...this.buildHistoryView());   break;
+      case "settings":  body.append(...this.buildSettingsView());  break;
     }
 
     this.root.appendChild(body);
@@ -150,6 +165,10 @@ export class WorkflowUI {
     el.querySelector("#aiv-btn-close")?.addEventListener("click", () => this.callbacks.onClose());
     el.querySelector("#aiv-btn-history")?.addEventListener("click", () => {
       this.currentView = "history";
+      this.render();
+    });
+    el.querySelector("#aiv-btn-settings")?.addEventListener("click", () => {
+      this.currentView = "settings";
       this.render();
     });
 
@@ -558,6 +577,16 @@ export class WorkflowUI {
     sendBtn.addEventListener("click", () => this.handleSend(tpl));
 
     btnRow.append(copyBtn, sendBtn);
+
+    // API Generate button — only shown when API is configured
+    if (this.apiConfig?.enabled && this.apiConfig.key) {
+      const apiBtn = document.createElement("button");
+      apiBtn.className = "aiv-btn aiv-btn-api";
+      apiBtn.style.marginTop = "6px";
+      apiBtn.textContent = "🤖 API 生成";
+      apiBtn.addEventListener("click", () => this.handleApiGenerate(tpl, preview, apiBtn));
+      detail.appendChild(apiBtn);
+    }
     detail.appendChild(btnRow);
 
     // Feature #3: Chain to next stage
@@ -688,6 +717,291 @@ export class WorkflowUI {
 
     bar.appendChild(chainBtn);
     return bar;
+  }
+
+  // ── Settings View ──────────────────────────────────────────────────────────
+
+  private buildSettingsView(): HTMLElement[] {
+    const els: HTMLElement[] = [];
+
+    // Back header
+    const header = document.createElement("div");
+    header.className = "aiv-detail-header";
+    const back = document.createElement("button");
+    back.className = "aiv-back-btn";
+    back.innerHTML = "‹";
+    back.addEventListener("click", () => { this.currentView = "templates"; this.render(); });
+    const title = document.createElement("div");
+    title.className = "aiv-detail-title";
+    title.textContent = "⚙️ API 設定";
+    header.append(back, title);
+    els.push(header);
+
+    const cfg = this.apiConfig ?? { key: "", endpoint: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemma-3-27b-it", enabled: false };
+
+    // ── API Config form ──
+    const section = document.createElement("div");
+    section.className = "aiv-settings-section";
+
+    // Enable toggle
+    const enableRow = document.createElement("div");
+    enableRow.className = "aiv-settings-row";
+    enableRow.innerHTML = `<span class="aiv-settings-label">啟用 API 協助</span>`;
+    const toggleWrap = document.createElement("label");
+    toggleWrap.className = "aiv-toggle";
+    const toggleInput = document.createElement("input");
+    toggleInput.type = "checkbox";
+    toggleInput.checked = cfg.enabled;
+    const track = document.createElement("div");
+    track.className = "aiv-toggle-track";
+    const thumb = document.createElement("div");
+    thumb.className = "aiv-toggle-thumb";
+    toggleWrap.append(toggleInput, track, thumb);
+    enableRow.appendChild(toggleWrap);
+    section.appendChild(enableRow);
+
+    // API Key
+    const keyGroup = document.createElement("div");
+    keyGroup.className = "aiv-var-group";
+    keyGroup.innerHTML = `<label class="aiv-var-label">API 金鑰</label>`;
+    const keyWrap = document.createElement("div");
+    keyWrap.className = "aiv-settings-key-wrap";
+    const keyInput = document.createElement("input");
+    keyInput.className = "aiv-var-input";
+    keyInput.type = "password";
+    keyInput.placeholder = "sk-... 或 AIzaSy...";
+    keyInput.value = cfg.key;
+    const eyeBtn = document.createElement("button");
+    eyeBtn.className = "aiv-settings-eye";
+    eyeBtn.type = "button";
+    eyeBtn.textContent = "👁";
+    eyeBtn.title = "顯示/隱藏";
+    eyeBtn.addEventListener("click", () => {
+      keyInput.type = keyInput.type === "password" ? "text" : "password";
+    });
+    keyWrap.append(keyInput, eyeBtn);
+    keyGroup.appendChild(keyWrap);
+    section.appendChild(keyGroup);
+
+    // Model selector + custom input
+    const modelGroup = document.createElement("div");
+    modelGroup.className = "aiv-var-group";
+    modelGroup.innerHTML = `<label class="aiv-var-label">模型</label>`;
+
+    const modelSelect = document.createElement("select");
+    modelSelect.className = "aiv-style-select";
+    const isCustom = !PRESET_MODELS.some((m) => m.value === cfg.model && m.value !== "__custom__");
+    PRESET_MODELS.forEach((m) => {
+      const opt = document.createElement("option");
+      opt.value = m.value;
+      opt.textContent = m.label;
+      modelSelect.appendChild(opt);
+    });
+    modelSelect.value = isCustom ? "__custom__" : cfg.model;
+
+    const customInput = document.createElement("input");
+    customInput.className = "aiv-var-input";
+    customInput.style.marginTop = "4px";
+    customInput.placeholder = "輸入自訂模型名稱";
+    customInput.value = cfg.model;
+    customInput.style.display = (modelSelect.value === "__custom__") ? "block" : "none";
+
+    modelSelect.addEventListener("change", () => {
+      customInput.style.display = modelSelect.value === "__custom__" ? "block" : "none";
+      if (modelSelect.value !== "__custom__") customInput.value = modelSelect.value;
+    });
+
+    modelGroup.append(modelSelect, customInput);
+    section.appendChild(modelGroup);
+
+    // Endpoint
+    const epGroup = document.createElement("div");
+    epGroup.className = "aiv-var-group";
+    epGroup.innerHTML = `<label class="aiv-var-label">API Endpoint（OpenAI 相容格式）</label>`;
+    const epInput = document.createElement("input");
+    epInput.className = "aiv-var-input";
+    epInput.type = "text";
+    epInput.placeholder = "https://generativelanguage.googleapis.com/v1beta/openai";
+    epInput.value = cfg.endpoint;
+    epGroup.appendChild(epInput);
+    section.appendChild(epGroup);
+
+    // Hint
+    const hint = document.createElement("div");
+    hint.className = "aiv-settings-hint";
+    hint.textContent = "設定變更後自動儲存。金鑰僅存於本機 chrome.storage.local。";
+    section.appendChild(hint);
+
+    els.push(section);
+
+    // Auto-save on any change
+    const autoSave = () => {
+      const model = modelSelect.value === "__custom__" ? customInput.value.trim() : modelSelect.value;
+      const next: ApiConfig = {
+        key: keyInput.value.trim(),
+        endpoint: epInput.value.trim() || "https://generativelanguage.googleapis.com/v1beta/openai",
+        model: model || "gemma-3-27b-it",
+        enabled: toggleInput.checked,
+      };
+      this.apiConfig = next;
+      saveApiConfig(next);
+    };
+    [keyInput, epInput, customInput].forEach((el) => el.addEventListener("input", autoSave));
+    toggleInput.addEventListener("change", autoSave);
+    modelSelect.addEventListener("change", autoSave);
+
+    // ── API History ──
+    const histHeader = document.createElement("div");
+    histHeader.className = "aiv-detail-header";
+    histHeader.style.marginTop = "12px";
+    const histTitle = document.createElement("div");
+    histTitle.className = "aiv-detail-title";
+    histTitle.textContent = "📜 API 呼叫歷史";
+
+    const exportBtn = document.createElement("button");
+    exportBtn.className = "aiv-project-btn";
+    exportBtn.textContent = "⬇ 匯出";
+    exportBtn.addEventListener("click", () => {
+      exportApiHistoryJson().then((json) => {
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `api-history-${Date.now()}.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+    });
+
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "aiv-project-btn";
+    clearBtn.textContent = "清除";
+    clearBtn.addEventListener("click", () => {
+      clearApiHistory().then(() => {
+        this.currentView = "settings";
+        this.render();
+      });
+    });
+
+    histHeader.append(histTitle, exportBtn, clearBtn);
+    els.push(histHeader);
+
+    // History list (async)
+    const listPlaceholder = document.createElement("div");
+    els.push(listPlaceholder);
+    getApiHistory().then((history) => {
+      if (history.length === 0) {
+        listPlaceholder.appendChild(this.buildEmpty("尚無 API 呼叫記錄", "使用「🤖 API 生成」後會記錄在此"));
+        return;
+      }
+      const list = document.createElement("div");
+      list.className = "aiv-history-list";
+      history.forEach((entry) => {
+        const item = document.createElement("div");
+        item.className = "aiv-history-item";
+
+        const meta = document.createElement("div");
+        meta.className = "aiv-history-meta";
+        meta.innerHTML = `
+          <span class="aiv-history-stage">${entry.stage}</span>
+          <span style="font-size:10px;color:var(--aiv-muted)">${entry.model}</span>
+          <span class="aiv-history-time">${this.formatTime(entry.sentAt)}</span>`;
+
+        const promptPreview = document.createElement("div");
+        promptPreview.className = "aiv-history-preview";
+        promptPreview.style.borderBottom = "1px solid var(--aiv-border)";
+        promptPreview.style.paddingBottom = "4px";
+        promptPreview.style.marginBottom = "4px";
+        promptPreview.textContent = "▶ " + entry.prompt.substring(0, 80) + (entry.prompt.length > 80 ? "…" : "");
+
+        const respPreview = document.createElement("div");
+        respPreview.className = "aiv-history-preview";
+        respPreview.textContent = "◀ " + entry.response.substring(0, 120) + (entry.response.length > 120 ? "…" : "");
+
+        const reuseBtn = document.createElement("button");
+        reuseBtn.className = "aiv-project-btn";
+        reuseBtn.style.marginTop = "5px";
+        reuseBtn.textContent = "↩ 回填回應";
+        reuseBtn.addEventListener("click", () => {
+          navigator.clipboard.writeText(entry.response).then(() => this.toast("已複製 API 回應", "success"));
+        });
+
+        item.append(meta, promptPreview, respPreview, reuseBtn);
+        list.appendChild(item);
+      });
+      listPlaceholder.appendChild(list);
+    });
+
+    return els;
+  }
+
+  // ── API Generate ───────────────────────────────────────────────────────────
+
+  private async handleApiGenerate(
+    tpl: WorkflowTemplate,
+    preview: HTMLElement,
+    btn: HTMLButtonElement
+  ): Promise<void> {
+    const prompt = this.getFilledContent();
+    if (!prompt.trim()) { this.toast("請先填入變數", "error"); return; }
+
+    btn.disabled = true;
+    btn.textContent = "⏳ 生成中…";
+
+    try {
+      const response = await this.callApi(prompt);
+
+      // Fill response into preview
+      preview.innerHTML = this.esc(response).replace(/\n/g, "<br>");
+
+      // Save to history
+      const entry: ApiHistoryEntry = {
+        id: crypto.randomUUID(),
+        prompt,
+        response,
+        model: this.apiConfig?.model ?? "",
+        stage: this.activeTab,
+        sentAt: Date.now(),
+      };
+      await addToApiHistory(entry);
+
+      btn.textContent = "✅ 生成完成";
+      setTimeout(() => { btn.textContent = "🤖 API 生成"; btn.disabled = false; }, 2000);
+      this.toast("API 回應已填入預覽區", "success");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.toast(`API 錯誤：${msg}`, "error");
+      btn.textContent = "🤖 API 生成";
+      btn.disabled = false;
+    }
+  }
+
+  private async callApi(prompt: string): Promise<string> {
+    const cfg = this.apiConfig;
+    if (!cfg || !cfg.key) throw new Error("尚未設定 API 金鑰");
+
+    const endpoint = cfg.endpoint.replace(/\/$/, "") + "/chat/completions";
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${cfg.key}`,
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`${res.status} ${err.substring(0, 200)}`);
+    }
+
+    const data = await res.json() as { choices?: { message?: { content?: string } }[] };
+    const text = data?.choices?.[0]?.message?.content;
+    if (!text) throw new Error("API 回應格式異常");
+    return text;
   }
 
   private buildHistoryView(): HTMLElement[] {

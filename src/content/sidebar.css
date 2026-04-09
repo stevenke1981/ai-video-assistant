@@ -798,6 +798,65 @@
 .aiv-empty-title { font-size: 13px; font-weight: 700; }
 .aiv-empty-desc { font-size: 11px; line-height: 1.6; }
 
+/* ── API Button ──────────────────────────────────────── */
+.aiv-btn-api {
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  color: #fff;
+  width: 100%;
+}
+.aiv-btn-api:disabled { opacity: .6; cursor: not-allowed; }
+
+/* ── Settings View ───────────────────────────────────── */
+.aiv-settings-section {
+  background: var(--aiv-bg3);
+  border: 1px solid var(--aiv-border);
+  border-radius: var(--aiv-radius-sm);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aiv-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aiv-settings-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--aiv-text);
+}
+
+.aiv-settings-key-wrap {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.aiv-settings-key-wrap .aiv-var-input { flex: 1; }
+
+.aiv-settings-eye {
+  background: var(--aiv-bg);
+  border: 1px solid var(--aiv-border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--aiv-muted);
+  flex-shrink: 0;
+  transition: border-color var(--aiv-transition);
+}
+.aiv-settings-eye:hover { border-color: var(--aiv-brand); }
+
+.aiv-settings-hint {
+  font-size: 10px;
+  color: var(--aiv-muted);
+  line-height: 1.5;
+  border-top: 1px solid var(--aiv-border);
+  padding-top: 8px;
+}
+
 /* ── Resize Handle ───────────────────────────────────── */
 .aiv-resize-handle {
   position: absolute;

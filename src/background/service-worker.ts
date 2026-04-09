@@ -9,10 +9,14 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.commands.onCommand.addListener((command) => {
   if (command === "toggle-sidebar") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       const tab = tabs[0];
       if (tab?.id !== undefined) {
-        chrome.tabs.sendMessage(tab.id, { action: "toggle-sidebar" });
+        try {
+          await chrome.tabs.sendMessage(tab.id, { action: "toggle-sidebar" });
+        } catch {
+          // Content script not ready or tab not supported — ignore
+        }
       }
     });
   }

@@ -15,6 +15,9 @@ import {
   DefaultsManifest,
   TemplateFile,
   extractVariables,
+  ApiConfig,
+  ApiHistoryEntry,
+  DEFAULT_API_CONFIG,
 } from "../models/workflow";
 
 // ── Storage Keys ─────────────────────────────────────────────────────────────
@@ -30,6 +33,8 @@ const KEYS = {
   SETTINGS: "aiv_settings",
   INITIALIZED: "aiv_initialized",
   VAR_CACHE: "aiv_var_cache",
+  API_CONFIG: "aiv_api_config",
+  API_HISTORY: "aiv_api_history",
 } as const;
 
 const MAX_HISTORY = 100;
@@ -302,4 +307,38 @@ export async function getVarCache(): Promise<Record<string, string>> {
 
 export async function saveVarCache(cache: Record<string, string>): Promise<void> {
   await set(KEYS.VAR_CACHE, cache);
+}
+
+// ── API Config ────────────────────────────────────────────────────────────────
+
+export async function getApiConfig(): Promise<ApiConfig> {
+  return (await get<ApiConfig>(KEYS.API_CONFIG)) ?? { ...DEFAULT_API_CONFIG };
+}
+
+export async function saveApiConfig(config: ApiConfig): Promise<void> {
+  await set(KEYS.API_CONFIG, config);
+}
+
+// ── API History ───────────────────────────────────────────────────────────────
+
+const MAX_API_HISTORY = 50;
+
+export async function getApiHistory(): Promise<ApiHistoryEntry[]> {
+  return (await get<ApiHistoryEntry[]>(KEYS.API_HISTORY)) ?? [];
+}
+
+export async function addToApiHistory(entry: ApiHistoryEntry): Promise<void> {
+  const history = await getApiHistory();
+  history.unshift(entry);
+  if (history.length > MAX_API_HISTORY) history.length = MAX_API_HISTORY;
+  await set(KEYS.API_HISTORY, history);
+}
+
+export async function clearApiHistory(): Promise<void> {
+  await set(KEYS.API_HISTORY, []);
+}
+
+export async function exportApiHistoryJson(): Promise<string> {
+  const history = await getApiHistory();
+  return JSON.stringify(history, null, 2);
 }

@@ -8,7 +8,7 @@ import { initDefaults, getSettings, saveSettings } from "../storage/workflows";
 import { WorkflowUI, UICallbacks } from "./workflow-ui";
 import type { StoryProject } from "../models/workflow";
 
-const SIDEBAR_ROOT_ID = "aiv-sidebar-root";
+const SIDEBAR_ROOT_ID = "aiv-root";
 const SHADOW_HOST_ID = "aiv-shadow-host";
 
 class SidebarController {
@@ -50,7 +50,7 @@ class SidebarController {
     // Inject CSS into shadow root
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = chrome.runtime.getURL("content.css");
+    link.href = chrome.runtime.getURL("sidebar.css");
     this.shadow.appendChild(link);
 
     // Sidebar panel
@@ -139,11 +139,11 @@ class SidebarController {
 
   private setupMessageListener(): void {
     chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-      if (msg.type === "toggle-sidebar") {
+      if (msg.action === "toggle-sidebar") {
         this.toggle();
         sendResponse({ ok: true });
       }
-      if (msg.type === "open-history") {
+      if (msg.action === "open-history") {
         this.openHistory();
         sendResponse({ ok: true });
       }

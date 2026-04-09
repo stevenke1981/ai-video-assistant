@@ -24,6 +24,7 @@ function copyStaticFiles() {
   const staticFiles = [
     ["manifest.json", "manifest.json"],
     ["src/popup/popup.html", "popup.html"],
+    ["src/content/sidebar.css", "sidebar.css"],
   ];
 
   for (const [src, dest] of staticFiles) {

@@ -173,6 +173,40 @@ export interface TemplateFile {
   templates: Omit<WorkflowTemplate, "id" | "createdAt" | "updatedAt">[];
 }
 
+// ── API Config ───────────────────────────────────────────────────────────────
+
+export interface ApiConfig {
+  key: string;
+  /** OpenAI-compatible base URL, e.g. https://generativelanguage.googleapis.com/v1beta/openai */
+  endpoint: string;
+  model: string;
+  enabled: boolean;
+}
+
+export interface ApiHistoryEntry {
+  id: string;
+  prompt: string;
+  response: string;
+  model: string;
+  stage: WorkflowStage;
+  sentAt: number;
+}
+
+export const DEFAULT_API_CONFIG: ApiConfig = {
+  key: "",
+  endpoint: "https://generativelanguage.googleapis.com/v1beta/openai",
+  model: "gemma-3-27b-it",
+  enabled: false,
+};
+
+export const PRESET_MODELS = [
+  { label: "Gemma 3 27B (Google AI Studio)", value: "gemma-3-27b-it" },
+  { label: "Gemma 2 27B (Google AI Studio)", value: "gemma-2-27b-it" },
+  { label: "GPT-4o mini (OpenAI)", value: "gpt-4o-mini" },
+  { label: "GPT-4o (OpenAI)", value: "gpt-4o" },
+  { label: "自訂（手動輸入）", value: "__custom__" },
+];
+
 // ── Settings ─────────────────────────────────────────────────────────────────
 
 export interface Settings {

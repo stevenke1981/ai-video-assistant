@@ -44,6 +44,18 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["defaults.json", "templates/*.json", "sidebar.css"],
+      "matches": [
+        "https://x.com/*",
+        "https://grok.com/*",
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*",
+        "https://claude.ai/*"
+      ]
+    }
+  ],
   "commands": {
     "toggle-sidebar": {
       "suggested_key": {
